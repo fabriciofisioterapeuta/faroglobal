@@ -48,7 +48,7 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated
 
-# --- BANCO DE DADOS COMPLETO (VITRINE DE ALTA CONVERSÃO + RADAR NACIONAL 3 FONTES) ---
+# --- BANCO DE DADOS COMPLETO ---
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -80,34 +80,27 @@ def init_db():
     c.execute("SELECT COUNT(*) FROM opportunities")
     if c.fetchone()[0] == 0:
         seed_items = [
-            # BRASIL (10 ITENS)
+            # BRASIL
             ("Creatina Monohidratada Pura 300g", "Creatina Monohidratada Pura (Campeã de Buscas)", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Suplemento nº 1 em pedidos recorrentes e buscas diárias nos marketplaces brasileiros.", "Alta taxa de recompra mensal (ciclo de 30 dias) e forte procura orgânica.", "Praticantes de musculação, corredores e público fitness.", "Google Trends BR + Autocomplete", "A partir de R$ 59 • ★ 4.9 (10k+ vendidos)", "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?auto=format&fit=crop&w=800&q=80", 1, 97, "https://trends.google.com.br/trends/explore?geo=BR&q=Creatina%20Monohidratada", "https://lista.mercadolivre.com.br/creatina-monohidratada-pura", "https://www.amazon.com.br/s?k=creatina+monohidratada+pura", "https://www.amazon.com.br/s?k=creatina+monohidratada+pura", datetime.now().strftime("%d/%m/%Y %H:%M")),
             ("Mini Projetor Portátil 4K Wi-Fi", "Mini Projetor Smart Portátil Full HD / 4K com Wi-Fi", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Fenômeno viral nas redes sociais e campeão de vendas para cinema em casa e apresentações.", "Alta viralização em vídeos curtos com excelente conversão no Brasil.", "Famílias, gamers, estudantes e profissionais externos.", "Radar Ofertas Quentes BR", "Faixa de R$ 229 • ★ 4.8 (Viral BR)", "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=800&q=80", 1, 94, "https://trends.google.com.br/trends/explore?geo=BR&q=Mini%20Projetor%20Portatil", "https://lista.mercadolivre.com.br/mini-projetor-portatil-wifi", "https://shopee.com.br/search?keyword=mini%20projetor%20portatil", "https://shopee.com.br/search?keyword=mini%20projetor%20portatil", datetime.now().strftime("%d/%m/%Y %H:%M")),
             ("Air Fryer Digital & Acessórios", "Kit Formas de Silicone & Acessórios para Air Fryer", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Um dos itens mais pesquisados e vendidos na Shopee e Mercado Livre com altíssima conversão.", "Compra por impulso de ticket baixo com altíssimo volume diário.", "Donos de fritadeira elétrica e compradores de utilidades domésticas.", "Google Autocomplete BR", "A partir de R$ 29 • ★ 4.8 (+50k pedidos)", "https://images.unsplash.com/photo-1585515320310-259814833e62?auto=format&fit=crop&w=800&q=80", 0, 95, "https://trends.google.com.br/trends/explore?geo=BR&q=Forma%20Silicone%20Air%20Fryer", "https://lista.mercadolivre.com.br/forma-silicone-air-fryer", "https://shopee.com.br/search?keyword=forma%20silicone%20air%20fryer", "https://shopee.com.br/search?keyword=forma%20silicone%20air%20fryer", datetime.now().strftime("%d/%m/%Y %H:%M")),
             ("Fone Bluetooth TWS ANC", "Fone de Ouvido Sem Fio TWS com Cancelamento de Ruído", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Líder absoluto em buscas de eletrônicos portáteis no Brasil com excelente custo-benefício.", "Alta procura diária para academia, corridas e reuniões online.", "Praticantes de esportes, estudantes e trabalhadores remotos.", "Google Trends BR + Ofertas", "Faixa de R$ 89 • ★ 4.8 (Top Áudio BR)", "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=800&q=80", 0, 93, "https://trends.google.com.br/trends/explore?geo=BR&q=Fone%20Bluetooth%20TWS", "https://lista.mercadolivre.com.br/fone-bluetooth-tws-anc", "https://www.amazon.com.br/s?k=fone+bluetooth+tws+anc", "https://www.amazon.com.br/s?k=fone+bluetooth+tws+anc", datetime.now().strftime("%d/%m/%Y %H:%M")),
             ("Sérum Facial Vitamina C & Ácido Hialurônico", "Kit Skincare Sérum Vitamina C + Ácido Hialurônico", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Categoria de beleza com maior crescimento de buscas e recompra recorrente no Brasil.", "Forte engajamento orgânico e alta taxa de recompra a cada 45 dias.", "Público interessado em cuidados com a pele e estética facial.", "Google Autocomplete BR", "A partir de R$ 44 • ★ 4.9 (Top Beleza)", "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80", 0, 92, "https://trends.google.com.br/trends/explore?geo=BR&q=Serum%20Vitamina%20C", "https://lista.mercadolivre.com.br/serum-vitamina-c-acido-hialuronico", "https://www.amazon.com.br/s?k=serum+vitamina+c+acido+hialuronico", "https://www.amazon.com.br/s?k=serum+vitamina+c+acido+hialuronico", datetime.now().strftime("%d/%m/%Y %H:%M")),
             ("Smartwatch Esportivo GPS", "Relógio Inteligente Esportivo com Monitor Cardíaco e GPS", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Alta procura entre praticantes de corrida de rua, academia e ciclismo em todo o país.", "Crescimento contínuo das assessorias de corrida e provas de rua no Brasil.", "Corredores de rua, ciclistas e entusiastas de saúde.", "Radar Ofertas Quentes BR", "Faixa de R$ 179 • ★ 4.8 (Fitness BR)", "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?auto=format&fit=crop&w=800&q=80", 0, 91, "https://trends.google.com.br/trends/explore?geo=BR&q=Smartwatch%20GPS%20Corrida", "https://lista.mercadolivre.com.br/smartwatch-esportivo-gps", "https://www.amazon.com.br/s?k=smartwatch+esportivo+gps", "https://www.amazon.com.br/s?k=smartwatch+esportivo+gps", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Pistola de Massagem Muscular", "Pistola Massageadora Profunda para Recuperação Muscular", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Sucesso entre atletas amadores, corredores e fisioterapeutas para alívio miofascial rápido.", "Excelente margem e alta percepção de valor como presente ou uso próprio.", "Corredores, praticantes de crossfit, academias e clínicas.", "Google Trends BR", "Faixa de R$ 119 • ★ 4.8 (Recuperação)", "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80", 0, 90, "https://trends.google.com.br/trends/explore?geo=BR&q=Pistola%20Massageadora%20Muscular", "https://lista.mercadolivre.com.br/pistola-massageadora-muscular", "https://www.amazon.com.br/s?k=pistola+massageadora+muscular", "https://www.amazon.com.br/s?k=pistola+massageadora+muscular", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Garrafa Térmica Inox 1L", "Garrafa Térmica Inteligente em Aço Inox Parede Dupla", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Item essencial no dia a dia de trabalho, academia e viagens com alta durabilidade.", "Produto perene com pico de buscas em épocas quentes.", "Estudantes, trabalhadores, atletas e viajantes.", "Google Autocomplete BR", "A partir de R$ 49 • ★ 4.9 (+30k pedidos)", "https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=800&q=80", 0, 89, "https://trends.google.com.br/trends/explore?geo=BR&q=Garrafa%20Termica%20Inox", "https://lista.mercadolivre.com.br/garrafa-termica-inox", "https://shopee.com.br/search?keyword=garrafa%20termica%20inox", "https://shopee.com.br/search?keyword=garrafa%20termica%20inox", datetime.now().strftime("%d/%m/%Y %H:%M")),
             ("Curso Automação WhatsApp & IA BR", "Formação Prática de IA & Automação Comercial no WhatsApp", "Brasil", "Brasil 🇧🇷", "Cursos & IA", "Treinamento mais procurado por empresas e profissionais que querem automatizar atendimento.", "Demanda crescente por redução de custos operacionais com agentes de IA.", "Donos de negócios locais, clínicas, infoprodutores e gestores.", "Google Autocomplete BR", "Acesso Imediato • ★ 4.9 (Hotmart/Kiwify)", "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80", 0, 96, "https://trends.google.com.br/trends/explore?geo=BR&q=Automacao%20WhatsApp%20IA", "https://lista.mercadolivre.com.br/curso-automacao-whatsapp", "https://hotmart.com/pt-br/marketplace/produtos?q=automacao+whatsapp+ia", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
             ("Planilha Controle Financeiro 2026 BR", "Planilha Automática de Finanças Pessoais & Investimentos", "Brasil", "Brasil 🇧🇷", "Templates & Planilhas", "Dashboard pronto em Excel e Google Sheets para organizar orçamento e metas mensais.", "Produto digital de entrega imediata e altíssima conversão no início e fim de mês.", "Assalariados, autônomos, casais e investidores iniciantes.", "Google Autocomplete BR", "A partir de R$ 37 • Entrega Imediata", "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=800&q=80", 0, 91, "https://trends.google.com.br/trends/explore?geo=BR&q=Planilha%20Controle%20Financeiro", "https://lista.mercadolivre.com.br/planilha-controle-financeiro", "https://hotmart.com/pt-br/marketplace/produtos?q=planilha+controle+financeiro", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
 
-            # ESTADOS UNIDOS (3 ITENS)
+            # ESTADOS UNIDOS
             ("AI Workflow Automation Course", "Curso Completo de Automação com IA (Sem Código)", "Estados Unidos", "Estados Unidos 🇺🇸", "Cursos & IA", "Treinamento prático americano para automatizar atendimento e vendas usando agentes de IA.", "Explosão de buscas nos EUA por fluxos no n8n e Make com baixa oferta em português.", "Empreendedores digitais, gestores de tráfego e agências.", "Google Trends US", "Acesso Vitalício • ★ 4.9 (Validado EUA)", "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80", 1, 96, "https://trends.google.com/trends/explore?geo=US&q=AI%20Workflow%20Automation", "https://lista.mercadolivre.com.br/curso-automacao-ia", "https://hotmart.com/pt-br/marketplace/produtos?q=automacao+ia", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
             ("Prompt Engineering Masterclass", "Formação Engenharia de Prompts para Negócios", "Estados Unidos", "Estados Unidos 🇺🇸", "Cursos & IA", "Biblioteca de comandos prontos para extrair resultados profissionais de ChatGPT e Claude.", "Alta procura por profissionais buscando produtividade imediata.", "Redatores, advogados, médicos, professores e consultores.", "Google Trends US", "A partir de R$ 67 • ★ 4.8 (Top IA EUA)", "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=800&q=80", 0, 90, "https://trends.google.com/trends/explore?geo=US&q=Prompt%20Engineering", "https://lista.mercadolivre.com.br/curso-engenharia-de-prompts", "https://hotmart.com/pt-br/marketplace/produtos?q=engenharia+de+prompts", "https://hotmart.com", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("AI Video Dubbing & Avatar Studio", "Ferramenta de Dublagem & Vídeos com Avatares de IA", "Estados Unidos", "Estados Unidos 🇺🇸", "Cursos & IA", "Plataforma americana que traduz vídeos com sincronia labial perfeita em segundos.", "Forte adoção por criadores de conteúdo e canais dark nos EUA.", "YouTubers, criadores de conteúdo, afiliados e professores.", "Google Trends US", "Plano Gratuito + Pro • Viral EUA", "https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=800&q=80", 0, 92, "https://trends.google.com/trends/explore?geo=US&q=AI%20Video%20Dubbing", "https://lista.mercadolivre.com.br/dublagem-ia", "https://www.google.com/search?q=AI+Video+Dubbing+Tool", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
 
-            # EUROPA (4 ITENS)
+            # EUROPA
             ("Notion Second Brain 2026 System", "Sistema Segundo Cérebro no Notion (Produtividade)", "Europa", "Europa (Reino Unido) 🇬🇧", "Templates & Planilhas", "Template completo de gestão de projetos, finanças e metas pessoais com alta demanda na Europa.", "Custo zero de estoque e entrega imediata via link duplicável do Notion.", "Estudantes universitários, freelancers e criadores de conteúdo.", "Google Trends UK", "A partir de R$ 47 • Entrega Imediata", "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=800&q=80", 0, 91, "https://trends.google.com/trends/explore?geo=GB&q=Notion%20Second%20Brain", "https://lista.mercadolivre.com.br/template-notion", "https://www.notion.so/templates/search?query=second+brain", "https://hotmart.com", datetime.now().strftime("%d/%m/%Y %H:%M")),
             ("Portable Espresso Maker Travel", "Cafeteira Portátil de Pressão para Viagem e Escritório", "Europa", "Europa (Alemanha) 🇩🇪", "Produtos Validados", "Gadget compacto que prepara café expresso sem eletricidade, viral em lojas europeias.", "Vídeos de demonstração com alto engajamento na Alemanha e Itália.", "Viajantes frequentes, motoristas, campistas e amantes de café.", "Google Trends DE", "Faixa de R$ 189 • ★ 4.9 (Sucesso EU)", "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80", 0, 93, "https://trends.google.com/trends/explore?geo=DE&q=Portable%20Espresso%20Maker", "https://lista.mercadolivre.com.br/cafeteira-portatil-expresso", "https://pt.aliexpress.com/wholesale?SearchText=portable+espresso+maker", "https://www.amazon.com.br/s?k=cafeteira+portatil+expresso", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Smart Posture Corrector Sensor", "Corretor Postural Inteligente com Sensor de Vibração", "Europa", "Europa (Reino Unido) 🇬🇧", "Produtos Validados", "Dispositivo discreto que vibra suavemente ao detectar má postura no computador.", "Grande procura entre trabalhadores em regime home office na Europa.", "Programadores, analistas, estudantes e trabalhadores de escritório.", "Google Trends UK", "Faixa de R$ 79 • ★ 4.7 (Home Office)", "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=800&q=80", 0, 88, "https://trends.google.com/trends/explore?geo=GB&q=Smart%20Posture%20Corrector", "https://lista.mercadolivre.com.br/corretor-postural-sensor", "https://pt.aliexpress.com/wholesale?SearchText=smart+posture+corrector", "https://www.amazon.com.br/s?k=corretor+postural+sensor", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Minimalist Desk Mat & Organizer", "Tapete de Mesa Ergonômico em Feltro & Organizador Setup", "Europa", "Europa (Alemanha) 🇩🇪", "Produtos Validados", "Acessório minimalista campeão de buscas para organização de mesas de trabalho e estudo.", "Alta viralização em vídeos de setup minimalista e produtividade.", "Designers, editores, estudantes e profissionais de TI.", "Google Trends DE", "Faixa de R$ 69 • ★ 4.8 (Setup Pro)", "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=800&q=80", 0, 89, "https://trends.google.com/trends/explore?geo=DE&q=Felt%20Desk%20Mat", "https://lista.mercadolivre.com.br/desk-mat-feltro", "https://pt.aliexpress.com/wholesale?SearchText=felt+desk+mat", "https://www.amazon.com.br/s?k=desk+mat+feltro", datetime.now().strftime("%d/%m/%Y %H:%M")),
 
-            # AMÉRICA DO SUL (4 ITENS)
+            # AMÉRICA DO SUL
             ("Sistema Gestión Clínicas & Turnos AR", "Sistema Inteligente de Agendamento & Gestão de Clínicas", "América do Sul", "Argentina 🇦🇷", "Templates & Planilhas", "Plataforma/planilha argentina de controle de pacientes, agendas e faturamento recorrente.", "Forte adoção por clínicas pequenas e consultórios buscando reduzir faltas.", "Fisioterapeutas, dentistas, psicólogos e clínicas de estética.", "Google Trends AR", "A partir de R$ 67 • ★ 4.9 (LATAM)", "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80", 0, 92, "https://trends.google.com/trends/explore?geo=AR&q=gestion%20turnos%20clinicas", "https://lista.mercadolivre.com.br/planilha-gestao-clinica", "https://hotmart.com/pt-br/marketplace/produtos?q=gestao+clinica", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Kit Mate Térmico Acero Inox UY", "Garrafa Térmica Inox de Precisão & Kit Chimarrão/Mate", "América do Sul", "Uruguai 🇺🇾", "Produtos Validados", "Modelo térmico de alta retenção de temperatura campeão de vendas no Uruguai e Sul do Brasil.", "Alta demanda regional e ticket médio elevado com ótima comissão.", "Consumidores de chimarrão, tereré e bebidas térmicas.", "Tendência Sul-Americana", "Faixa de R$ 149 • ★ 4.9 (Top UY)", "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=800&q=80", 0, 90, "https://www.google.com/search?q=termo+mate+acero+inoxidable+uruguay", "https://lista.mercadolivre.com.br/garrafa-termica-inox-mate", "https://www.amazon.com.br/s?k=garrafa+termica+inox+mate", "https://www.amazon.com.br/s?k=garrafa+termica+inox+mate", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Curso E-commerce & Dropshipping LATAM CO", "Método de Vendas Sem Estoque para América Latina", "América do Sul", "Colômbia 🇨🇴", "Cursos & IA", "Treinamento colombiano focado em operação enxuta e fornecedores locais rápidos.", "Forte interesse de iniciantes buscando renda extra online sem estoque.", "Empreendedores iniciantes e lojistas virtuais.", "Google Trends CO", "Acesso Completo • ★ 4.8 (Top CO)", "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80", 0, 88, "https://trends.google.com/trends/explore?geo=CO&q=curso%20ecommerce", "https://lista.mercadolivre.com.br/curso-ecommerce", "https://hotmart.com/pt-br/marketplace/produtos?q=ecommerce+sem+estoque", "https://hotmart.com", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Plantilla Finanzas & Inversiones CL", "Planilha Automatizada de Fluxo de Caixa e Metas", "América do Sul", "Chile 🇨🇱", "Templates & Planilhas", "Modelo financeiro limpo criado no Chile com gráficos automáticos de receitas e despesas.", "Alta procura por organização financeira pessoal e de pequenos negócios.", "Autônomos, pequenos comerciantes e famílias.", "Google Trends CL", "A partir de R$ 39 • ★ 4.8 (Top CL)", "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80", 0, 90, "https://trends.google.com/trends/explore?geo=CL&q=plantilla%20finanzas", "https://lista.mercadolivre.com.br/planilha-fluxo-de-caixa", "https://hotmart.com/pt-br/marketplace/produtos?q=planilha+fluxo+de+caixa", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M"))
+            ("Kit Mate Térmico Acero Inox UY", "Garrafa Térmica Inox de Precisão & Kit Chimarrão/Mate", "América do Sul", "Uruguai 🇺🇾", "Produtos Validados", "Modelo térmico de alta retenção de temperatura campeão de vendas no Uruguai e Sul do Brasil.", "Alta demanda regional e ticket médio elevado com ótima comissão.", "Consumidores de chimarrão, tereré e bebidas térmicas.", "Tendência Sul-Americana", "Faixa de R$ 149 • ★ 4.9 (Top UY)", "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=800&q=80", 0, 90, "https://www.google.com/search?q=termo+mate+acero+inoxidable+uruguay", "https://lista.mercadolivre.com.br/garrafa-termica-inox-mate", "https://www.amazon.com.br/s?k=garrafa+termica+inox+mate", "https://www.amazon.com.br/s?k=garrafa+termica+inox+mate", datetime.now().strftime("%d/%m/%Y %H:%M"))
         ]
         c.executemany('''
             INSERT OR IGNORE INTO opportunities (
@@ -121,12 +114,12 @@ def init_db():
 
 init_db()
 
-# --- MOTOR DE VARREDURA COM AS 3 FONTES DO RADAR NACIONAL BRASIL + INTERNACIONAL ---
+# --- MOTOR DE VARREDURA INTERNACIONAL 24H (4 FONTES NATIVAS) + BRASIL ---
 COMMERCIAL_KEYWORDS = [
-    "ai", "ia", "curso", "course", "template", "planilha", "notion", "app",
-    "software", "tool", "ferramenta", "kit", "pro", "smart", "mini", "portable",
-    "portatil", "guia", "guide", "ebook", "system", "sistema", "tracker",
-    "automacao", "automation", "marketing", "vendas", "fitness", "saude", "creatina", "fone", "air fryer"
+    "ai", "ia", "curso", "course", "template", "plantilla", "planilha", "notion", "app",
+    "software", "tool", "ferramenta", "herramienta", "kit", "pro", "smart", "mini", "portable",
+    "portatil", "guia", "guide", "ebook", "system", "sistema", "tracker", "automation",
+    "automacao", "marketing", "fitness", "saude", "creatina", "gadget", "workflow", "agent"
 ]
 
 DEFAULT_IMAGES = {
@@ -138,14 +131,14 @@ DEFAULT_IMAGES = {
 def is_commercial_opportunity(term, nicho="geral"):
     t = term.lower()
     if nicho == "ia":
-        return any(w in t for w in ["ai", "ia", "gpt", "curso", "course", "automacao", "automation", "software"])
+        return any(w in t for w in ["ai", "ia", "gpt", "agent", "curso", "course", "automation", "automacao", "software", "tool"])
     if nicho == "planilhas":
-        return any(w in t for w in ["template", "planilha", "notion", "sheet", "excel", "tracker", "sistema", "system"])
+        return any(w in t for w in ["template", "plantilla", "planilha", "notion", "sheet", "excel", "tracker", "sistema", "system"])
     return any(w in t for w in COMMERCIAL_KEYWORDS)
 
 def classify_format(term):
     t = term.lower()
-    if any(k in t for k in ["course", "curso", "class", "training", "ai", "ia", "gpt", "academy", "guide", "ebook"]):
+    if any(k in t for k in ["course", "curso", "class", "training", "ai", "ia", "gpt", "academy", "guide", "ebook", "agent", "software"]):
         return "Cursos & IA"
     if any(k in t for k in ["template", "plantilla", "planilha", "notion", "sheet", "excel", "plan", "dashboard", "tracker"]):
         return "Templates & Planilhas"
@@ -156,9 +149,8 @@ def build_supplier_url(fmt, term_origin, term_br):
         return f"https://hotmart.com/pt-br/marketplace/produtos?q={requests.utils.quote(term_br)}"
     if fmt == "Templates & Planilhas":
         return f"https://www.notion.so/templates/search?query={requests.utils.quote(term_origin)}"
-    return f"https://www.amazon.com.br/s?k={requests.utils.quote(term_br)}"
+    return f"https://pt.aliexpress.com/wholesale?SearchText={requests.utils.quote(term_origin)}"
 
-# FONTE 1: GOOGLE TRENDS RSS (BRASIL E INTERNACIONAL)
 def fetch_google_trends_rss(geo_code):
     terms = []
     try:
@@ -173,56 +165,65 @@ def fetch_google_trends_rss(geo_code):
         pass
     return terms
 
-# FONTE 2: GOOGLE AUTOCOMPLETE BRASIL (INTENÇÃO DE COMPRA REAL)
-def fetch_google_autocomplete_br():
-    prefixes = [
-        "melhor curso de ",
-        "ferramenta de ia para ",
-        "planilha de ",
-        "melhor produto para "
-    ]
+def fetch_native_autocomplete(gl, hl, prefixes):
     suggestions = []
     for p in prefixes:
         try:
-            url = f"https://suggestqueries.google.com/complete/search?client=firefox&hl=pt-BR&gl=br&q={requests.utils.quote(p)}"
+            url = f"https://suggestqueries.google.com/complete/search?client=firefox&hl={hl}&gl={gl}&q={requests.utils.quote(p)}"
             resp = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=8)
             if resp.status_code == 200:
                 data = resp.json()
                 if len(data) > 1:
                     for s in data[1][:3]:
-                        suggestions.append(s.strip().title())
+                        suggestions.append(s.strip())
         except Exception:
             continue
     return suggestions
 
-# FONTE 3: FEED RSS DE OFERTAS QUENTES NO BRASIL (PELANDO / PROMOÇÕES)
-def fetch_hot_deals_br():
-    deals = []
+def fetch_product_hunt_us():
+    items = []
     try:
-        url = "https://www.pelando.com.br/rss/recentes"
+        url = "https://www.producthunt.com/feed"
         resp = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
         if resp.status_code == 200:
             root = ET.fromstring(resp.content)
-            for item in root.findall(".//item/title")[:6]:
-                if item.text:
-                    clean_title = item.text.split("-")[0].strip()
-                    if len(clean_title) > 6:
-                        deals.append(clean_title)
+            for entry in root.findall(".//{http://www.w3.org/2005/Atom}entry")[:8]:
+                title_el = entry.find("{http://www.w3.org/2005/Atom}title")
+                if title_el is not None and title_el.text:
+                    items.append(title_el.text.strip())
     except Exception:
         pass
-    return deals
+    return items
 
-def save_opportunity(c, conn, term_origin, term_br, continent, region_label, source_name, geo_code="BR"):
+def fetch_reddit_opportunities():
+    subreddits = ["SideProject", "ProductivityApps", "BuyItForLife"]
+    found = []
+    headers = {"User-Agent": "Mozilla/5.0 (compatible; FaroGlobalBot/1.0)"}
+    for sub in subreddits:
+        try:
+            url = f"https://www.reddit.com/r/{sub}/top.json?t=day&limit=4"
+            resp = requests.get(url, headers=headers, timeout=8)
+            if resp.status_code == 200:
+                posts = resp.json().get("data", {}).get("children", [])
+                for post in posts:
+                    title = post.get("data", {}).get("title", "").strip()
+                    if 8 <= len(title) <= 85:
+                        found.append(title)
+        except Exception:
+            continue
+    return found
+
+def save_opportunity(c, conn, term_origin, term_br, continent, region_label, source_name, geo_code="US"):
     fmt = classify_format(term_br)
-    desc = f"Oportunidade captada automaticamente via {source_name} ({region_label})."
-    why = f"Sinal detectado em tempo real pela fonte {source_name} com forte intenção comercial."
-    audience = "Compradores ativos buscando novidades, produtividade ou ofertas validadas."
-    price_badge = "Captado Ao Vivo • Curadoria Verificada"
+    desc = f"Oportunidade internacional captada via {source_name} ({region_label}) antes da saturação no Brasil." if geo_code != "BR" else f"Tendência em alta captada via {source_name}."
+    why = f"Sinal validado em {region_label} pela fonte {source_name} com alto potencial de adaptação ao mercado brasileiro."
+    audience = "Empreendedores digitais, profissionais buscando produtividade ou consumidores de novidades."
+    price_badge = "Captado Ao Vivo • Radar 24h"
     img_url = DEFAULT_IMAGES.get(fmt)
     trend_url = f"https://trends.google.com/trends/explore?geo={geo_code}&q={requests.utils.quote(term_origin)}"
     br_url = f"https://lista.mercadolivre.com.br/{requests.utils.quote(term_br)}"
     supp_url = build_supplier_url(fmt, term_origin, term_br)
-    gap_score = 94 if geo_code == "BR" else 92
+    gap_score = 95 if geo_code in ("US", "GB", "DE") else 92
 
     try:
         c.execute('''
@@ -239,38 +240,59 @@ def save_opportunity(c, conn, term_origin, term_br, continent, region_label, sou
 def run_radar_cycle(nicho="geral"):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
+    translator = GoogleTranslator(source='auto', target='pt')
 
-    # 1. RADAR NACIONAL BRASIL (3 FONTES REAIS)
-    for term in fetch_google_trends_rss("BR"):
+    # 1. RADAR BRASIL
+    br_prefixes = ["melhor curso de ", "ferramenta de ia para ", "planilha de ", "melhor produto para "]
+    for term in fetch_google_trends_rss("BR") + fetch_native_autocomplete("br", "pt-BR", br_prefixes):
         if is_commercial_opportunity(term, nicho):
-            save_opportunity(c, conn, term, term, "Brasil", "Brasil 🇧🇷", "Google Trends RSS BR", "BR")
+            save_opportunity(c, conn, term, term.title(), "Brasil", "Brasil 🇧🇷", "Radar Nacional BR", "BR")
 
-    for term in fetch_google_autocomplete_br():
-        if is_commercial_opportunity(term, nicho):
-            save_opportunity(c, conn, term, term, "Brasil", "Brasil 🇧🇷", "Google Autocomplete BR", "BR")
+    if nicho == "brasil":
+        conn.close()
+        return
 
-    if nicho in ("geral", "brasil"):
-        for deal in fetch_hot_deals_br():
-            save_opportunity(c, conn, deal, deal, "Brasil", "Brasil 🇧🇷", "Radar Ofertas Quentes BR", "BR")
+    # 2. RADAR INTERNACIONAL MULTI-PAÍS
+    intl_configs = [
+        ("US", "us", "en", "Estados Unidos", "Estados Unidos 🇺🇸", ["best ai tool for ", "best notion template for ", "ai course for "]),
+        ("GB", "gb", "en-GB", "Europa", "Europa (Reino Unido) 🇬🇧", ["best ai workflow ", "best productivity template ", "viral gadget "]),
+        ("DE", "de", "de", "Europa", "Europa (Alemanha) 🇩🇪", ["beste ki tool ", "notion vorlage ", "online kurs "]),
+        ("FR", "fr", "fr", "Europa", "Europa (França) 🇫🇷", ["meilleur outil ia ", "modele notion ", "formation ia "]),
+        ("AR", "ar", "es-419", "América do Sul", "Argentina 🇦🇷", ["mejor curso de ", "plantilla excel ", "herramienta ia "]),
+        ("CL", "cl", "es-419", "América do Sul", "Chile 🇨🇱", ["curso de ia ", "plantilla notion ", "mejor producto "]),
+        ("CO", "co", "es-419", "América do Sul", "Colômbia 🇨🇴", ["curso ecommerce ", "herramienta ia ", "plantilla finanzas "])
+    ]
 
-    # 2. RADAR INTERNACIONAL (EUA, EUROPA E AMÉRICA DO SUL)
-    if nicho != "brasil":
-        intl_markets = [
-            ("US", "Estados Unidos", "Estados Unidos 🇺🇸"),
-            ("GB", "Europa", "Europa (Reino Unido) 🇬🇧"),
-            ("DE", "Europa", "Europa (Alemanha) 🇩🇪"),
-            ("AR", "América do Sul", "Argentina 🇦🇷"),
-            ("CL", "América do Sul", "Chile 🇨🇱"),
-            ("CO", "América do Sul", "Colômbia 🇨🇴")
-        ]
-        translator = GoogleTranslator(source='auto', target='pt')
-        for geo, continent, region_label in intl_markets:
-            for term in fetch_google_trends_rss(geo):
-                if not is_commercial_opportunity(term, nicho):
-                    continue
-                term_br = translator.translate(term)
-                save_opportunity(c, conn, term, term_br, continent, region_label, f"Google Trends {geo}", geo)
-                time.sleep(0.4)
+    for geo, gl, hl, continent, region_label, prefixes in intl_configs:
+        raw_terms = fetch_google_trends_rss(geo) + fetch_native_autocomplete(gl, hl, prefixes)
+        for term in raw_terms:
+            if not is_commercial_opportunity(term, nicho):
+                continue
+            try:
+                term_br = translator.translate(term).title()
+                save_opportunity(c, conn, term, term_br, continent, region_label, f"Radar Nativo {geo}", geo)
+                time.sleep(0.35)
+            except Exception:
+                continue
+
+    # 3. PRODUCT HUNT & REDDIT (EUA / EUROPA)
+    if nicho in ("geral", "ia"):
+        for ph_item in fetch_product_hunt_us():
+            try:
+                term_br = translator.translate(ph_item)
+                save_opportunity(c, conn, ph_item, term_br, "Estados Unidos", "Estados Unidos 🇺🇸", "Product Hunt US", "US")
+                time.sleep(0.35)
+            except Exception:
+                continue
+
+    for rd_item in fetch_reddit_opportunities():
+        if is_commercial_opportunity(rd_item, nicho):
+            try:
+                term_br = translator.translate(rd_item)
+                save_opportunity(c, conn, rd_item, term_br, "Estados Unidos", "Estados Unidos 🇺🇸", "Reddit Trending US/EU", "US")
+                time.sleep(0.35)
+            except Exception:
+                continue
 
     conn.close()
 
@@ -294,7 +316,7 @@ LOGO_SVG = """
 </svg>
 """
 
-# --- 1. VITRINE PÚBLICA LIMPA (SEM DADOS INTERNOS DE RADAR) ---
+# --- 1. VITRINE PÚBLICA ---
 PUBLIC_HTML = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -476,38 +498,37 @@ LOGIN_HTML = f"""
 </html>
 """
 
-# --- 3. PAINEL ADMINISTRATIVO EXCLUSIVO (COM AS 3 FONTES DO RADAR NACIONAL BRASIL) ---
+# --- 3. PAINEL ADMINISTRATIVO EXCLUSIVO ---
 ADMIN_HTML = """
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin • Radar Nacional 3 Fontes & Dossiês • Faro Global</title>
+    <title>Admin • Radar 24h & Dossiês • Faro Global</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans p-4 md:p-8">
     <div class="max-w-6xl mx-auto">
         <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 text-center shadow-sm">
             <h1 class="text-2xl font-black text-[#0A2540]">📡 Central de Inteligência & Auditoria • <span class="text-emerald-500">Faro Global</span></h1>
-            <p class="text-xs text-slate-500 mt-1">Radar Nacional Brasil (3 Fontes Ao Vivo), Internacional e Trilha Direta de Auditoria</p>
+            <p class="text-xs text-slate-500 mt-1">Radar Nacional Brasil + Motor Internacional 4 Fontes (EUA, Europa & América do Sul)</p>
             <div class="flex flex-wrap justify-center gap-3 mt-5">
-                <a href="/admin/run-now" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition shadow-sm">⚡ Rodar Varredura 3 Fontes BR + Global Agora</a>
+                <a href="/admin/run-now" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition shadow-sm">⚡ Rodar Varredura Global & Brasil Agora</a>
                 <a href="/" target="_blank" class="bg-[#0A2540] hover:bg-slate-800 text-white font-semibold px-5 py-2.5 rounded-xl text-xs transition">Abrir Vitrine Pública</a>
                 <a href="/admin/logout" class="bg-red-50 text-red-600 border border-red-200 font-semibold px-4 py-2.5 rounded-xl text-xs">Bloquear Painel</a>
             </div>
         </div>
 
-        <!-- PAINEL EXCLUSIVO DO RADAR NACIONAL BRASIL (3 FONTES ATIVAS) -->
         <div class="bg-gradient-to-br from-[#0A2540] to-slate-900 text-white rounded-2xl p-6 mb-8 shadow-lg">
             <div class="flex flex-col md:flex-row justify-between items-center gap-3 mb-4 border-b border-white/10 pb-4">
                 <div>
-                    <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full">Exclusivo Administrador • 3 Fontes Conectadas</span>
-                    <h2 class="text-lg font-black mt-1">🇧🇷 Radar Nacional Brasil — Fontes & Capturas Recentes</h2>
+                    <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full">Exclusivo Administrador • Radar Ao Vivo</span>
+                    <h2 class="text-lg font-black mt-1">🇧🇷 Radar Nacional Brasil — Últimas Capturas</h2>
                 </div>
                 <div class="flex flex-wrap gap-2 text-[11px] font-bold">
                     <a href="https://trends.google.com/trending?geo=BR" target="_blank" class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg">1. Google Trends BR ↗</a>
-                    <a href="https://www.google.com.br" target="_blank" class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg">2. Autocomplete BR ↗</a>
-                    <a href="https://www.pelando.com.br/recentes" target="_blank" class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg">3. Ofertas Quentes BR ↗</a>
+                    <a href="https://www.producthunt.com" target="_blank" class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg">2. Product Hunt US ↗</a>
+                    <a href="https://www.reddit.com/r/SideProject/top/" target="_blank" class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg">3. Reddit Trending ↗</a>
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -524,7 +545,6 @@ ADMIN_HTML = """
             </div>
         </div>
 
-        <!-- FORMULÁRIO DE CADASTRO MANUAL -->
         <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-8 shadow-sm">
             <h2 class="text-sm font-extrabold text-[#0A2540] uppercase tracking-wider mb-4 text-center">+ Cadastrar Novo Produto / Curso na Vitrine</h2>
             <form method="POST" action="/admin/add-item" class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -556,7 +576,6 @@ ADMIN_HTML = """
             </form>
         </div>
 
-        <!-- LISTA DE DOSSIÊS COMPLETOS -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             {% for item in items %}
             <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
@@ -586,151 +605,4 @@ ADMIN_HTML = """
                         <div class="grid grid-cols-3 gap-2 text-[11px] font-bold">
                             <a href="{{ item[14] }}" target="_blank" class="bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 py-2 px-2 rounded-lg text-center transition">1. Fonte Trends ↗</a>
                             <a href="{{ item[15] }}" target="_blank" class="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 py-2 px-2 rounded-lg text-center transition">2. Mercado BR ↗</a>
-                            <a href="{{ item[16] }}" target="_blank" class="bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 py-2 px-2 rounded-lg text-center transition">3. Fornecedor/Plat. ↗</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-4 pt-4 border-t border-slate-100">
-                    <label class="block text-[11px] font-bold text-[#0A2540] mb-1">4. Destino Final do Botão da Vitrine (Link de Afiliado / Checkout):</label>
-                    <form method="POST" action="/admin/update-link/{{ item[0] }}" class="flex gap-2">
-                        <input type="url" name="affiliate_url" value="{{ item[17] }}" class="flex-1 bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs">
-                        <a href="{{ item[17] }}" target="_blank" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-3 py-2 rounded-lg text-xs flex items-center">Testar</a>
-                        <button type="submit" class="bg-[#0A2540] hover:bg-emerald-600 text-white font-bold px-3.5 py-2 rounded-lg text-xs transition">Salvar</button>
-                    </form>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</body>
-</html>
-"""
-
-# --- ROTAS ---
-@app.route("/")
-def public_home():
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("SELECT * FROM opportunities WHERE is_featured = 1 ORDER BY id DESC LIMIT 3")
-    featured_items = c.fetchall()
-    c.execute("SELECT * FROM opportunities ORDER BY id DESC LIMIT 100")
-    items = c.fetchall()
-    conn.close()
-    return render_template_string(PUBLIC_HTML, items=items, featured_items=featured_items)
-
-@app.route("/admin/login", methods=["GET", "POST"])
-def admin_login():
-    ip = request.headers.get("X-Forwarded-For", request.remote_addr)
-    if is_ip_blocked(ip):
-        return render_template_string(LOGIN_HTML, error="IP bloqueado por 30 minutos."), 429
-    if request.method == "POST":
-        if request.form.get("password") == ADMIN_PASSWORD:
-            FAILED_LOGINS.pop(ip, None)
-            session["admin_logged_in"] = True
-            return redirect(url_for("admin_dashboard"))
-        register_failed_login(ip)
-        return render_template_string(LOGIN_HTML, error="Senha incorreta."), 401
-    return render_template_string(LOGIN_HTML, error=None)
-
-@app.route("/admin/logout")
-def admin_logout():
-    session.clear()
-    return redirect(url_for("public_home"))
-
-@app.route("/admin")
-@login_required
-def admin_dashboard():
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("SELECT * FROM opportunities WHERE continent = 'Brasil' ORDER BY id DESC LIMIT 12")
-    br_items = c.fetchall()
-    c.execute("SELECT * FROM opportunities ORDER BY is_featured DESC, id DESC LIMIT 120")
-    items = c.fetchall()
-    conn.close()
-    return render_template_string(ADMIN_HTML, items=items, br_items=br_items)
-
-@app.route("/admin/toggle-featured/<int:item_id>")
-@login_required
-def toggle_featured(item_id):
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("UPDATE opportunities SET is_featured = CASE WHEN is_featured = 1 THEN 0 ELSE 1 END WHERE id = ?", (item_id,))
-    conn.commit()
-    conn.close()
-    return redirect(url_for("admin_dashboard"))
-
-@app.route("/admin/add-item", methods=["POST"])
-@login_required
-def add_item():
-    term_br = request.form.get("term_br", "").strip()
-    term_origin = request.form.get("term_origin", "").strip()
-    continent, region = request.form.get("region_combo", "Brasil|Brasil 🇧🇷").split("|")
-    fmt = request.form.get("format_type", "Produtos Validados").strip()
-    price_badge = request.form.get("price_badge", "Oferta Verificada").strip()
-    img_url = request.form.get("image_url", "").strip() or DEFAULT_IMAGES.get(fmt)
-    why = request.form.get("why_trending", "").strip()
-    audience = request.form.get("target_audience", "").strip()
-    supp_url = request.form.get("supplier_url", "").strip()
-    aff_url = request.form.get("affiliate_url", "").strip()
-    desc = request.form.get("description", "").strip()
-
-    if term_br and term_origin and aff_url:
-        geo = "BR" if continent == "Brasil" else ("US" if continent == "Estados Unidos" else "GB")
-        trend_url = f"https://trends.google.com/trends/explore?geo={geo}&q={requests.utils.quote(term_origin)}"
-        br_url = f"https://lista.mercadolivre.com.br/{requests.utils.quote(term_br)}"
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute('''
-            INSERT OR REPLACE INTO opportunities (
-                term_origin, term_br, continent, region, format_type, description,
-                why_trending, target_audience, source_name, price_badge, image_url, is_featured,
-                gap_score, trend_source_url, br_market_url, supplier_url, affiliate_url, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (term_origin, term_br, continent, region, fmt, desc, why, audience, f"Curadoria {region}", price_badge, img_url, 0, 95, trend_url, br_url, supp_url, aff_url, datetime.now().strftime("%d/%m/%Y %H:%M")))
-        conn.commit()
-        conn.close()
-    return redirect(url_for("admin_dashboard"))
-
-@app.route("/admin/update-link/<int:item_id>", methods=["POST"])
-@login_required
-def update_link(item_id):
-    new_url = request.form.get("affiliate_url", "").strip()
-    if new_url:
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute("UPDATE opportunities SET affiliate_url = ? WHERE id = ?", (new_url, item_id))
-        conn.commit()
-        conn.close()
-    return redirect(url_for("admin_dashboard"))
-
-@app.route("/admin/delete/<int:item_id>")
-@login_required
-def delete_item(item_id):
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("DELETE FROM opportunities WHERE id = ?", (item_id,))
-    conn.commit()
-    conn.close()
-    return redirect(url_for("admin_dashboard"))
-
-@app.route("/admin/run-now")
-@login_required
-def run_now():
-    threading.Thread(target=run_radar_cycle, args=("geral",)).start()
-    return redirect(url_for("admin_dashboard"))
-
-@app.route("/scan")
-def cron_scan():
-    if request.args.get("key") != CRON_SECRET_KEY:
-        return jsonify({"error": "unauthorized"}), 401
-    nicho = request.args.get("nicho", "geral").strip()
-    threading.Thread(target=run_radar_cycle, args=(nicho,)).start()
-    return jsonify({"status": "ok", "pesquisa": nicho, "time": str(datetime.now())})
-
-@app.route("/ping")
-def ping():
-    return "OK", 200
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+                            <a href="{{ item[16] }}" target="_blank"
