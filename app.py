@@ -3,10 +3,10 @@ import time
 import sqlite3
 import threading
 import requests
+import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from functools import wraps
 from deep_translator import GoogleTranslator
-from pytrends.request import TrendReq
 from flask import Flask, render_template_string, jsonify, request, session, redirect, url_for
 
 app = Flask(__name__)
@@ -17,7 +17,7 @@ ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "Admin@2026!")
 CRON_SECRET_KEY = os.environ.get("CRON_SECRET_KEY", "radar2026")
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN", "")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
-DB_PATH = "faroglobal.db"
+DB_PATH = "faroglobal_v3.db"
 
 # --- PROTEÇÃO ANTI-FORÇA BRUTA ---
 FAILED_LOGINS = {}
@@ -58,9 +58,11 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             term_origin TEXT UNIQUE,
             term_br TEXT,
+            continent TEXT,
             region TEXT,
             format_type TEXT,
             description TEXT,
+            channel_metric TEXT,
             br_listings INTEGER,
             gap_score INTEGER,
             origin_url TEXT,
@@ -74,44 +76,54 @@ def init_db():
     c.execute("SELECT COUNT(*) FROM opportunities")
     if c.fetchone()[0] == 0:
         seed_items = [
-            ("AI Workflow Automation Course", "Curso Completo de Automação com IA (Sem Código)", "Estados Unidos 🇺🇸", "Cursos & IA", "Treinamento prático americano para automatizar atendimento e vendas usando agentes de IA.", 2, 95, "https://www.google.com/search?q=AI+Workflow+Automation+Course", "https://lista.mercadolivre.com.br/curso-automacao-ia", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Notion Second Brain 2026 System", "Sistema Segundo Cérebro no Notion (Produtividade)", "Europa (Reino Unido) 🇬🇧", "Templates & Planilhas", "Template completo de gestão de projetos, finanças e metas pessoais com alta demanda na Europa.", 4, 91, "https://www.google.com/search?q=Notion+Second+Brain+Template", "https://lista.mercadolivre.com.br/template-notion", "https://hotmart.com", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Financial Control & Investment Tracker", "Planilha Inteligente de Controle Financeiro & Aportes", "Estados Unidos 🇺🇸", "Templates & Planilhas", "Dashboard automatizado para controle de gastos, reserva de emergência e metas mensais.", 6, 87, "https://www.google.com/search?q=Financial+Control+Spreadsheet+Template", "https://lista.mercadolivre.com.br/planilha-controle-financeiro", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Portable Espresso Maker Travel", "Cafeteira Portátil de Pressão para Viagem e Escritório", "Europa (Alemanha) 🇩🇪", "Produtos Validados", "Gadget compacto que prepara café expresso sem eletricidade, viral em lojas europeias.", 3, 93, "https://www.google.com/search?q=Portable+Espresso+Maker", "https://lista.mercadolivre.com.br/cafeteira-portatil-expresso", "https://www.amazon.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Prompt Engineering Masterclass", "Formação Engenharia de Prompts para Negócios", "Estados Unidos 🇺🇸", "Cursos & IA", "Biblioteca de comandos prontos e método para extrair resultados profissionais de IAs.", 5, 89, "https://www.google.com/search?q=Prompt+Engineering+Masterclass", "https://lista.mercadolivre.com.br/curso-engenharia-de-prompts", "https://hotmart.com", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Smart Posture Corrector Sensor", "Corretor Postural Inteligente com Sensor de Vibração", "Europa (Reino Unido) 🇬🇧", "Produtos Validados", "Dispositivo discreto que vibra suavemente ao detectar má postura durante o trabalho no computador.", 7, 84, "https://www.google.com/search?q=Smart+Posture+Corrector+Sensor", "https://lista.mercadolivre.com.br/corretor-postural-inteligente", "https://www.amazon.com.br", datetime.now().strftime("%d/%m/%Y %H:%M"))
+            # BRASIL - MAIS VENDIDOS & BUSCADOS
+            ("Creatina Monohidratada Pura 300g", "Creatina Monohidratada Pura (Campeã de Buscas)", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Suplemento nº 1 em pedidos recorrentes e buscas diárias nos marketplaces brasileiros.", "Mercado Livre & Amazon • +450 mil buscas/mês", 12, 97, "https://trends.google.com.br", "https://lista.mercadolivre.com.br/creatina-monohidratada-pura", "https://www.amazon.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Air Fryer Digital & Acessórios", "Kit Formas de Silicone & Acessórios para Air Fryer", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Um dos itens mais pesquisados e vendidos na Shopee e Mercado Livre com altíssima conversão.", "Shopee & Mercado Livre • +380 mil buscas/mês", 18, 95, "https://trends.google.com.br", "https://lista.mercadolivre.com.br/forma-silicone-air-fryer", "https://shopee.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Fone Bluetooth TWS ANC", "Fone de Ouvido Sem Fio TWS com Cancelamento de Ruído", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Líder absoluto em buscas de eletrônicos portáteis no Brasil com ticket acessível.", "Shopee & Amazon • +310 mil buscas/mês", 15, 93, "https://trends.google.com.br", "https://lista.mercadolivre.com.br/fone-bluetooth-tws-anc", "https://www.amazon.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Sérum Facial Vitamina C & Ácido Hialurônico", "Kit Skincare Sérum Vitamina C + Ácido Hialurônico", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Categoria de beleza com maior crescimento de buscas e recompra recorrente na internet brasileira.", "Amazon & Shopee • +290 mil buscas/mês", 14, 92, "https://trends.google.com.br", "https://lista.mercadolivre.com.br/serum-vitamina-c-acido-hialuronico", "https://www.amazon.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Smartwatch Esportivo GPS", "Relógio Inteligente Esportivo com Monitor Cardíaco e GPS", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Alta procura entre praticantes de corrida, academia e ciclismo em todo o país.", "Mercado Livre • +260 mil buscas/mês", 16, 90, "https://trends.google.com.br", "https://lista.mercadolivre.com.br/smartwatch-esportivo-gps", "https://www.amazon.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Mini Projetor Portátil 4K Wi-Fi", "Mini Projetor Smart Portátil Full HD / 4K com Wi-Fi", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Fenômeno viral nas redes sociais e campeão de vendas para cinema em casa.", "Shopee & Mercado Livre • +240 mil buscas/mês", 11, 94, "https://trends.google.com.br", "https://lista.mercadolivre.com.br/mini-projetor-portatil-wifi", "https://shopee.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Curso Automação IA & Prompts BR", "Formação Prática de IA & Automação para Negócios", "Brasil", "Brasil 🇧🇷", "Cursos & IA", "Tema digital mais pesquisado por empreendedores e profissionais brasileiros.", "Hotmart & Kiwify • +190 mil buscas/mês", 8, 96, "https://trends.google.com.br", "https://lista.mercadolivre.com.br/curso-inteligencia-artificial", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+
+            # AMÉRICA DO SUL
+            ("Sistema Gestión Clínicas & Turnos AR", "Sistema Inteligente de Agendamento & Gestão de Clínicas", "América do Sul", "Argentina 🇦🇷", "Templates & Planilhas", "Plataforma argentina de controle de pacientes, agendas e faturamento recorrente.", "Tendência LATAM • Baixa concorrência BR", 3, 92, "https://www.google.com/search?q=sistema+gestion+turnos+clinicas+argentina", "https://lista.mercadolivre.com.br/planilha-gestao-clinica", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Kit Mate Térmico Acero Inox UY", "Garrafa Térmica Inox de Precisão & Kit Chimarrão/Mate", "América do Sul", "Uruguai 🇺🇾", "Produtos Validados", "Modelo térmico de alta retenção de temperatura campeão de vendas no Uruguai e Argentina.", "Tendência Sul-Americana", 5, 89, "https://www.google.com/search?q=termo+mate+acero+inoxidable+uruguay", "https://lista.mercadolivre.com.br/garrafa-termica-inox-mate", "https://www.amazon.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Curso E-commerce & Dropshipping LATAM CO", "Método de Vendas Sem Estoque para América Latina", "América do Sul", "Colômbia 🇨🇴", "Cursos & IA", "Treinamento colombiano focado em operação enxuta e logística rápida na América do Sul.", "Top Vendas Colômbia", 4, 88, "https://www.google.com/search?q=curso+ecommerce+latam+colombia", "https://lista.mercadolivre.com.br/curso-ecommerce", "https://hotmart.com", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Plantilla Finanzas & Inversiones CL", "Planilha Automatizada de Fluxo de Caixa e Metas", "América do Sul", "Chile 🇨🇱", "Templates & Planilhas", "Modelo financeiro limpo criado no Chile com alta taxa de conversão.", "Top Digital Chile", 3, 90, "https://www.google.com/search?q=plantilla+finanzas+personales+chile", "https://lista.mercadolivre.com.br/planilha-controle-financeiro", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+
+            # ESTADOS UNIDOS
+            ("AI Workflow Automation Course", "Curso Completo de Automação com IA (Sem Código)", "Estados Unidos", "Estados Unidos 🇺🇸", "Cursos & IA", "Treinamento prático americano para automatizar atendimento e vendas usando agentes de IA.", "Alta demanda EUA", 2, 95, "https://www.google.com/search?q=AI+Workflow+Automation+Course", "https://lista.mercadolivre.com.br/curso-automacao-ia", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Prompt Engineering Masterclass", "Formação Engenharia de Prompts para Negócios", "Estados Unidos", "Estados Unidos 🇺🇸", "Cursos & IA", "Biblioteca de comandos prontos e método para extrair resultados profissionais de IAs.", "Top IA EUA", 5, 89, "https://www.google.com/search?q=Prompt+Engineering+Masterclass", "https://lista.mercadolivre.com.br/curso-engenharia-de-prompts", "https://hotmart.com", datetime.now().strftime("%d/%m/%Y %H:%M")),
+
+            # EUROPA
+            ("Notion Second Brain 2026 System", "Sistema Segundo Cérebro no Notion (Produtividade)", "Europa", "Europa (Reino Unido) 🇬🇧", "Templates & Planilhas", "Template completo de gestão de projetos, finanças e metas pessoais com alta demanda na Europa.", "Top Produtividade UK", 4, 91, "https://www.google.com/search?q=Notion+Second+Brain+Template", "https://lista.mercadolivre.com.br/template-notion", "https://hotmart.com", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Portable Espresso Maker Travel", "Cafeteira Portátil de Pressão para Viagem e Escritório", "Europa", "Europa (Alemanha) 🇩🇪", "Produtos Validados", "Gadget compacto que prepara café expresso sem eletricidade, viral em lojas europeias.", "Viral Europa", 3, 93, "https://www.google.com/search?q=Portable+Espresso+Maker", "https://lista.mercadolivre.com.br/cafeteira-portatil-expresso", "https://www.amazon.com.br", datetime.now().strftime("%d/%m/%Y %H:%M"))
         ]
         c.executemany('''
-            INSERT OR IGNORE INTO opportunities (term_origin, term_br, region, format_type, description, br_listings, gap_score, origin_url, br_url, affiliate_url, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT OR IGNORE INTO opportunities (term_origin, term_br, continent, region, format_type, description, channel_metric, br_listings, gap_score, origin_url, br_url, affiliate_url, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', seed_items)
         conn.commit()
     conn.close()
 
 init_db()
 
-# --- ALERTA TELEGRAM ---
-def send_telegram_alert(item):
-    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
-        return
-    msg = (
-        f"🚨 *FARO GLOBAL — NOVA OPORTUNIDADE (GAP: {item['gap_score']}/100)*\n\n"
-        f"🌍 *Origem:* {item['region']} — {item['term_origin']}\n"
-        f"🇧🇷 *Brasil:* {item['term_br']}\n"
-        f"📦 *Categoria:* {item['format_type']} | *Concorrentes BR:* {item['br_listings']}\n\n"
-        f"🔗 [Ver Fonte Original]({item['origin_url']})\n"
-        f"🔍 [Checar Brasil]({item['br_url']})"
-    )
-    try:
-        requests.post(
-            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-            json={"chat_id": TELEGRAM_CHAT_ID, "text": msg, "parse_mode": "Markdown"},
-            timeout=10
-        )
-    except Exception:
-        pass
+# --- MOTOR DE VARREDURA COMERCIAL (RSS GOOGLE TRENDS + MERCADO LIVRE) ---
+COMMERCIAL_KEYWORDS = [
+    "ai", "ia", "curso", "course", "template", "planilha", "notion", "app",
+    "software", "tool", "ferramenta", "kit", "pro", "smart", "mini", "portable",
+    "portatil", "guia", "guide", "ebook", "system", "sistema", "tracker",
+    "automacao", "automation", "marketing", "vendas", "fitness", "saude", "creatina"
+]
 
-# --- MOTOR DE VARREDURA (EUA & EUROPA -> BRASIL) ---
+def is_commercial_opportunity(term, nicho="geral"):
+    t = term.lower()
+    if nicho == "ia":
+        return any(w in t for w in ["ai", "ia", "gpt", "curso", "course", "automacao", "automation", "software"])
+    if nicho == "planilhas":
+        return any(w in t for w in ["template", "planilha", "notion", "sheet", "excel", "tracker", "sistema", "system"])
+    return any(w in t for w in COMMERCIAL_KEYWORDS)
+
 def check_br_saturation(term_br):
     try:
         url = f"https://api.mercadolibre.com/sites/MLB/search?q={requests.utils.quote(term_br)}&limit=1"
@@ -124,71 +136,63 @@ def check_br_saturation(term_br):
 
 def classify_format(term):
     t = term.lower()
-    if any(k in t for k in ["course", "class", "training", "ai", "gpt", "academy", "guide", "ebook"]):
+    if any(k in t for k in ["course", "curso", "class", "training", "ai", "ia", "gpt", "academy", "guide", "ebook"]):
         return "Cursos & IA"
-    if any(k in t for k in ["template", "notion", "sheet", "excel", "plan", "dashboard", "tracker"]):
+    if any(k in t for k in ["template", "plantilla", "planilha", "notion", "sheet", "excel", "plan", "dashboard", "tracker"]):
         return "Templates & Planilhas"
     return "Produtos Validados"
 
-def run_radar_cycle():
-    regions = [
-        ("united_states", "Estados Unidos 🇺🇸"),
-        ("united_kingdom", "Europa (Reino Unido) 🇬🇧"),
-        ("germany", "Europa (Alemanha) 🇩🇪")
+def fetch_google_trends_rss(geo_code):
+    terms = []
+    try:
+        url = f"https://trends.google.com/trending/rss?geo={geo_code}"
+        resp = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
+        if resp.status_code == 200:
+            root = ET.fromstring(resp.content)
+            for item in root.findall(".//item/title"):
+                if item.text:
+                    terms.append(item.text.strip())
+    except Exception:
+        pass
+    return terms
+
+def run_radar_cycle(nicho="geral"):
+    all_markets = [
+        ("BR", "Brasil", "Brasil 🇧🇷"),
+        ("AR", "América do Sul", "Argentina 🇦🇷"),
+        ("CL", "América do Sul", "Chile 🇨🇱"),
+        ("CO", "América do Sul", "Colômbia 🇨🇴"),
+        ("US", "Estados Unidos", "Estados Unidos 🇺🇸"),
+        ("GB", "Europa", "Europa (Reino Unido) 🇬🇧"),
+        ("DE", "Europa", "Europa (Alemanha) 🇩🇪")
     ]
+    markets = [m for m in all_markets if m[0] == "BR"] if nicho == "brasil" else all_markets
     translator = GoogleTranslator(source='auto', target='pt')
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    found_any = False
 
-    for pn, region_label in regions:
-        try:
-            pytrends = TrendReq(hl='en-US', tz=360)
-            df = pytrends.trending_searches(pn=pn)
-            for term in df[0].tolist()[:5]:
-                found_any = True
-                term_br = translator.translate(term)
-                br_count = check_br_saturation(term_br)
-                gap_score = 96 if br_count == 0 else (89 if br_count <= 5 else (81 if br_count <= 25 else 65))
-                fmt = classify_format(term)
-                desc = f"Tendência em alta captada em {region_label} com baixa saturação no mercado brasileiro."
-                origin_url = f"https://www.google.com/search?q={requests.utils.quote(term)}"
-                br_url = f"https://lista.mercadolivre.com.br/{requests.utils.quote(term_br)}"
-
-                try:
-                    c.execute('''
-                        INSERT INTO opportunities (term_origin, term_br, region, format_type, description, br_listings, gap_score, origin_url, br_url, affiliate_url, created_at)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ''', (term, term_br, region_label, fmt, desc, br_count, gap_score, origin_url, br_url, br_url, datetime.now().strftime("%d/%m/%Y %H:%M")))
-                    conn.commit()
-                    if gap_score >= 80:
-                        send_telegram_alert({"term_origin": term, "term_br": term_br, "region": region_label, "format_type": fmt, "br_listings": br_count, "gap_score": gap_score, "origin_url": origin_url, "br_url": br_url})
-                except sqlite3.IntegrityError:
-                    pass
-                time.sleep(1.0)
-        except Exception:
-            continue
-
-    # Fallback se o Google Trends limitar o IP do servidor gratuito
-    if not found_any:
-        fallback_trends = [
-            ("AI Video Dubbing Tool", "Ferramenta de Dublagem Automática de Vídeos com IA", "Estados Unidos 🇺🇸", "Cursos & IA", "Software americano que traduz e sincroniza lábios em vídeos para qualquer idioma."),
-            ("Magnetic Phone Gym Mount", "Suporte Magnético de Celular para Academia", "Europa (Alemanha) 🇩🇪", "Produtos Validados", "Acessório magnético viral entre praticantes de musculação na Europa."),
-            ("Agency Client Portal Notion", "Portal Completo de Clientes no Notion para Prestadores de Serviço", "Europa (Reino Unido) 🇬🇧", "Templates & Planilhas", "Sistema pronto para organizar entregas, contratos e cronogramas com clientes.")
-        ]
-        for term, term_br, reg, fmt, desc in fallback_trends:
+    for geo, continent, region_label in markets:
+        for term in fetch_google_trends_rss(geo):
+            if not is_commercial_opportunity(term, nicho):
+                continue
+            term_br = term if geo == "BR" else translator.translate(term)
             br_count = check_br_saturation(term_br)
-            gap_score = 92 if br_count <= 10 else 83
+            gap_score = 94 if geo == "BR" else (96 if br_count <= 5 else (89 if br_count <= 30 else 80))
+            fmt = classify_format(term_br)
+            metric = "Google Trends BR • Alta Procura" if geo == "BR" else f"Radar {region_label} • {br_count} no BR"
+            desc = f"Oportunidade validada captada automaticamente em {region_label}."
             origin_url = f"https://www.google.com/search?q={requests.utils.quote(term)}"
             br_url = f"https://lista.mercadolivre.com.br/{requests.utils.quote(term_br)}"
+
             try:
                 c.execute('''
-                    INSERT INTO opportunities (term_origin, term_br, region, format_type, description, br_listings, gap_score, origin_url, br_url, affiliate_url, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (term, term_br, reg, fmt, desc, br_count, gap_score, origin_url, br_url, br_url, datetime.now().strftime("%d/%m/%Y %H:%M")))
+                    INSERT INTO opportunities (term_origin, term_br, continent, region, format_type, description, channel_metric, br_listings, gap_score, origin_url, br_url, affiliate_url, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (term, term_br, continent, region_label, fmt, desc, metric, br_count, gap_score, origin_url, br_url, br_url, datetime.now().strftime("%d/%m/%Y %H:%M")))
                 conn.commit()
             except sqlite3.IntegrityError:
                 pass
+            time.sleep(0.5)
     conn.close()
 
 # --- LOGO VETORIAL OFICIAL FARO GLOBAL ---
@@ -211,13 +215,13 @@ LOGO_SVG = """
 </svg>
 """
 
-# --- 1. VITRINE PÚBLICA COMPLETA E CENTRALIZADA ---
+# --- 1. VITRINE PÚBLICA COMPLETA ---
 PUBLIC_HTML = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faro Global • Radar de Tendências & Oportunidades</title>
+    <title>Faro Global • Radar de Tendências & Mais Vendidos</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans antialiased">
@@ -231,24 +235,45 @@ PUBLIC_HTML = f"""
         </div>
     </nav>
 
-    <header class="max-w-4xl mx-auto px-4 pt-10 pb-8 text-center">
+    <header class="max-w-5xl mx-auto px-4 pt-10 pb-8 text-center">
         {LOGO_SVG}
         <h1 class="mt-3 text-3xl md:text-5xl font-black tracking-tight">
             <span class="text-[#0A2540]">FARO</span> <span class="text-emerald-500">GLOBAL</span>
         </h1>
-        <p class="text-[11px] font-bold tracking-[0.22em] text-[#0A2540] uppercase mt-1">Radar de Tendências & Oportunidades</p>
+        <p class="text-[11px] font-bold tracking-[0.22em] text-[#0A2540] uppercase mt-1">Radar de Tendências & Mais Vendidos</p>
         <p class="mt-4 text-slate-600 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
-            Monitoramento automatizado dos mercados dos <strong>Estados Unidos</strong> e da <strong>Europa</strong> para você acessar ferramentas de IA, cursos e produtos validados antes de virarem tendência no Brasil.
+            Monitore os produtos e cursos mais vendidos no <strong>Brasil</strong> e descubra oportunidades validadas na <strong>América do Sul</strong>, <strong>Estados Unidos</strong> e <strong>Europa</strong>.
         </p>
 
-        <!-- Barra de Busca e Filtros -->
-        <div id="vitrine" class="mt-8 max-w-2xl mx-auto space-y-4">
-            <input type="text" id="searchInput" onkeyup="filterCards()" placeholder="🔍 Buscar curso, ferramenta de IA, planilha ou produto..." class="w-full bg-white border border-slate-300 rounded-2xl px-5 py-3.5 text-sm shadow-sm focus:outline-none focus:border-emerald-500">
+        <div id="vitrine" class="mt-8 max-w-3xl mx-auto space-y-4">
+            <input type="text" id="searchInput" onkeyup="filterCards()" placeholder="🔍 Buscar produto mais vendido, curso de IA, planilha ou termo pesquisado..." class="w-full bg-white border border-slate-300 rounded-2xl px-5 py-3.5 text-sm shadow-sm focus:outline-none focus:border-emerald-500">
+
             <div class="flex flex-wrap justify-center gap-2 text-xs font-bold">
-                <button onclick="setCategory('ALL', this)" class="cat-btn bg-[#0A2540] text-white px-4 py-2 rounded-full transition">Todas ({{{{ items|length }}}})</button>
-                <button onclick="setCategory('Cursos & IA', this)" class="cat-btn bg-white text-slate-600 border border-slate-200 hover:border-slate-400 px-4 py-2 rounded-full transition">Cursos & IA</button>
-                <button onclick="setCategory('Templates & Planilhas', this)" class="cat-btn bg-white text-slate-600 border border-slate-200 hover:border-slate-400 px-4 py-2 rounded-full transition">Templates & Planilhas</button>
-                <button onclick="setCategory('Produtos Validados', this)" class="cat-btn bg-white text-slate-600 border border-slate-200 hover:border-slate-400 px-4 py-2 rounded-full transition">Produtos Validados</button>
+                <button onclick="setContinent('ALL', this)" class="cont-btn bg-[#0A2540] text-white px-4 py-2 rounded-full transition">🌍 Todos os Mercados</button>
+                <button onclick="setContinent('Brasil', this)" class="cont-btn bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100 px-4 py-2 rounded-full transition">🇧🇷 Brasil • Mais Vendidos & Buscados</button>
+                <button onclick="setContinent('América do Sul', this)" class="cont-btn bg-white text-slate-600 border border-slate-200 hover:border-slate-400 px-4 py-2 rounded-full transition">🌎 América do Sul</button>
+                <button onclick="setContinent('Estados Unidos', this)" class="cont-btn bg-white text-slate-600 border border-slate-200 hover:border-slate-400 px-4 py-2 rounded-full transition">🇺🇸 Estados Unidos</button>
+                <button onclick="setContinent('Europa', this)" class="cont-btn bg-white text-slate-600 border border-slate-200 hover:border-slate-400 px-4 py-2 rounded-full transition">🇪🇺 Europa</button>
+            </div>
+
+            <div id="brHotBanner" class="hidden bg-emerald-50/90 border border-emerald-200 rounded-2xl p-4 text-center">
+                <p class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-800 mb-2">🔥 Termos Mais Pesquisados no Brasil Agora (Clique para filtrar)</p>
+                <div class="flex flex-wrap justify-center gap-1.5 text-xs">
+                    <button onclick="quickSearch('Creatina')" class="bg-white hover:bg-emerald-600 hover:text-white text-emerald-900 font-semibold px-3 py-1 rounded-full border border-emerald-200 transition">Creatina</button>
+                    <button onclick="quickSearch('Air Fryer')" class="bg-white hover:bg-emerald-600 hover:text-white text-emerald-900 font-semibold px-3 py-1 rounded-full border border-emerald-200 transition">Air Fryer</button>
+                    <button onclick="quickSearch('Fone')" class="bg-white hover:bg-emerald-600 hover:text-white text-emerald-900 font-semibold px-3 py-1 rounded-full border border-emerald-200 transition">Fone Bluetooth</button>
+                    <button onclick="quickSearch('Vitamina C')" class="bg-white hover:bg-emerald-600 hover:text-white text-emerald-900 font-semibold px-3 py-1 rounded-full border border-emerald-200 transition">Sérum Vitamina C</button>
+                    <button onclick="quickSearch('Projetor')" class="bg-white hover:bg-emerald-600 hover:text-white text-emerald-900 font-semibold px-3 py-1 rounded-full border border-emerald-200 transition">Mini Projetor</button>
+                    <button onclick="quickSearch('IA')" class="bg-white hover:bg-emerald-600 hover:text-white text-emerald-900 font-semibold px-3 py-1 rounded-full border border-emerald-200 transition">Automação IA</button>
+                    <button onclick="quickSearch('')" class="bg-slate-200 text-slate-700 font-semibold px-3 py-1 rounded-full">Limpar</button>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-2 text-xs font-semibold">
+                <button onclick="setCategory('ALL', this)" class="cat-btn bg-slate-800 text-white px-3.5 py-1.5 rounded-full transition">Todas as Categorias</button>
+                <button onclick="setCategory('Produtos Validados', this)" class="cat-btn bg-white text-slate-600 border border-slate-200 hover:border-slate-400 px-3.5 py-1.5 rounded-full transition">Produtos Validados</button>
+                <button onclick="setCategory('Cursos & IA', this)" class="cat-btn bg-white text-slate-600 border border-slate-200 hover:border-slate-400 px-3.5 py-1.5 rounded-full transition">Cursos & IA</button>
+                <button onclick="setCategory('Templates & Planilhas', this)" class="cat-btn bg-white text-slate-600 border border-slate-200 hover:border-slate-400 px-3.5 py-1.5 rounded-full transition">Templates & Planilhas</button>
             </div>
         </div>
     </header>
@@ -256,19 +281,22 @@ PUBLIC_HTML = f"""
     <main class="max-w-5xl mx-auto px-4 pb-16">
         <div id="cardsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
             {{% for item in items %}}
-            <div class="opp-card bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm hover:shadow-md transition flex flex-col justify-between text-center" data-cat="{{{{ item[4] }}}}" data-text="{{{{ item[2]|lower }}}} {{{{ item[1]|lower }}}} {{{{ item[5]|lower }}}}">
+            <div class="opp-card bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm hover:shadow-md transition flex flex-col justify-between text-center"
+                 data-cont="{{{{ item[3] }}}}"
+                 data-cat="{{{{ item[5] }}}}"
+                 data-text="{{{{ item[2]|lower }}}} {{{{ item[1]|lower }}}} {{{{ item[6]|lower }}}} {{{{ item[4]|lower }}}}">
                 <div>
                     <div class="flex flex-wrap justify-center items-center gap-1.5 text-[11px] font-bold mb-3">
-                        <span class="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full">{{{{ item[3] }}}}</span>
-                        <span class="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full">{{{{ item[4] }}}}</span>
+                        <span class="{{{{ 'bg-emerald-100 text-emerald-800' if item[3] == 'Brasil' else 'bg-slate-100 text-slate-700' }}}} px-2.5 py-1 rounded-full">{{{{ item[4] }}}}</span>
+                        <span class="bg-sky-50 text-sky-700 px-2.5 py-1 rounded-full">{{{{ item[5] }}}}</span>
                     </div>
                     <h3 class="text-lg font-extrabold text-[#0A2540] leading-snug">{{{{ item[2] }}}}</h3>
-                    <p class="text-xs text-slate-600 mt-2 leading-relaxed">{{{{ item[5] }}}}</p>
-                    <p class="text-[11px] text-slate-400 mt-3">Ref. Internacional: {{{{ item[1] }}}}</p>
+                    <p class="text-xs text-slate-600 mt-2 leading-relaxed">{{{{ item[6] }}}}</p>
+                    <p class="text-[11px] font-semibold text-emerald-700 mt-3">{{{{ item[7] }}}}</p>
                 </div>
-                <div class="mt-6 pt-4 border-t border-slate-100">
-                    <a href="{{{{ item[10] }}}}" target="_blank" class="block w-full bg-[#0A2540] hover:bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm transition shadow-sm">
-                        Acessar Oportunidade →
+                <div class="mt-5 pt-4 border-t border-slate-100">
+                    <a href="{{{{ item[12] }}}}" target="_blank" class="block w-full bg-[#0A2540] hover:bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm transition shadow-sm">
+                        Ver Oferta / Oportunidade →
                     </a>
                 </div>
             </div>
@@ -278,25 +306,46 @@ PUBLIC_HTML = f"""
 
     <footer class="border-t border-slate-200 py-8 text-center text-xs text-slate-500">
         <p class="font-bold text-[#0A2540]">FARO GLOBAL • faroglobal.com.br</p>
-        <p class="mt-1">Inteligência de Mercado & Curadoria Internacional 24/7</p>
+        <p class="mt-1">Monitoramento Brasil, América do Sul, EUA & Europa 24/7</p>
     </footer>
 
     <script>
+        let currentCont = 'ALL';
         let currentCat = 'ALL';
+
+        function setContinent(cont, btn) {{
+            currentCont = cont;
+            document.querySelectorAll('.cont-btn').forEach(b => {{
+                b.className = 'cont-btn bg-white text-slate-600 border border-slate-200 hover:border-slate-400 px-4 py-2 rounded-full transition';
+            }});
+            btn.className = cont === 'Brasil'
+                ? 'cont-btn bg-emerald-600 text-white px-4 py-2 rounded-full transition shadow-sm'
+                : 'cont-btn bg-[#0A2540] text-white px-4 py-2 rounded-full transition shadow-sm';
+            document.getElementById('brHotBanner').classList.toggle('hidden', cont !== 'Brasil');
+            filterCards();
+        }}
+
         function setCategory(cat, btn) {{
             currentCat = cat;
             document.querySelectorAll('.cat-btn').forEach(b => {{
-                b.className = 'cat-btn bg-white text-slate-600 border border-slate-200 hover:border-slate-400 px-4 py-2 rounded-full transition';
+                b.className = 'cat-btn bg-white text-slate-600 border border-slate-200 hover:border-slate-400 px-3.5 py-1.5 rounded-full transition';
             }});
-            btn.className = 'cat-btn bg-[#0A2540] text-white px-4 py-2 rounded-full transition';
+            btn.className = 'cat-btn bg-slate-800 text-white px-3.5 py-1.5 rounded-full transition';
             filterCards();
         }}
+
+        function quickSearch(term) {{
+            document.getElementById('searchInput').value = term;
+            filterCards();
+        }}
+
         function filterCards() {{
             const q = document.getElementById('searchInput').value.toLowerCase();
             document.querySelectorAll('.opp-card').forEach(card => {{
+                const matchCont = currentCont === 'ALL' || card.dataset.cont === currentCont;
                 const matchCat = currentCat === 'ALL' || card.dataset.cat === currentCat;
                 const matchText = card.dataset.text.includes(q);
-                card.style.display = (matchCat && matchText) ? 'flex' : 'none';
+                card.style.display = (matchCont && matchCat && matchText) ? 'flex' : 'none';
             }});
         }}
     </script>
@@ -340,78 +389,56 @@ ADMIN_HTML = """
     <div class="max-w-5xl mx-auto">
         <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 text-center shadow-sm">
             <h1 class="text-2xl font-black text-[#0A2540]">📡 Central Administrativa • <span class="text-emerald-500">Faro Global</span></h1>
-            <p class="text-xs text-slate-500 mt-1">Análise de Gap (EUA & Europa → Brasil), Cadastro de Ofertas e Gestão de Links</p>
+            <p class="text-xs text-slate-500 mt-1">Varredura Brasil, América do Sul, EUA & Europa + Gestão de Links</p>
             <div class="flex flex-wrap justify-center gap-3 mt-5">
-                <a href="/admin/run-now" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition shadow-sm">⚡ Forçar Varredura Agora (EUA & Europa)</a>
+                <a href="/admin/run-now" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition shadow-sm">⚡ Forçar Varredura Global & Brasil Agora</a>
                 <a href="/" target="_blank" class="bg-[#0A2540] hover:bg-slate-800 text-white font-semibold px-5 py-2.5 rounded-xl text-xs transition">Abrir Vitrine Pública</a>
                 <a href="/admin/logout" class="bg-red-50 text-red-600 border border-red-200 font-semibold px-4 py-2.5 rounded-xl text-xs">Bloquear Painel</a>
             </div>
         </div>
 
-        <!-- KPIs Rápidos -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 text-center">
-            <div class="bg-white border border-slate-200 rounded-xl p-4">
-                <p class="text-xs text-slate-500 font-semibold">Oportunidades Ativas</p>
-                <p class="text-2xl font-black text-[#0A2540] mt-1">{{ items|length }}</p>
-            </div>
-            <div class="bg-white border border-slate-200 rounded-xl p-4">
-                <p class="text-xs text-slate-500 font-semibold">Mercados Monitorados</p>
-                <p class="text-lg font-extrabold text-sky-600 mt-1">EUA 🇺🇸 • UK 🇬🇧 • DE 🇩🇪</p>
-            </div>
-            <div class="bg-white border border-slate-200 rounded-xl p-4">
-                <p class="text-xs text-slate-500 font-semibold">Status do Robô</p>
-                <p class="text-lg font-extrabold text-emerald-600 mt-1">Online 24/7</p>
-            </div>
-            <div class="bg-white border border-slate-200 rounded-xl p-4">
-                <p class="text-xs text-slate-500 font-semibold">Filtro de Qualidade</p>
-                <p class="text-lg font-extrabold text-[#0A2540] mt-1">Gap Score ≥ 70</p>
-            </div>
-        </div>
-
-        <!-- Formulário para Adicionar Nova Oferta/Curso Manualmente -->
         <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-8 shadow-sm">
-            <h2 class="text-sm font-extrabold text-[#0A2540] uppercase tracking-wider mb-4 text-center">+ Adicionar Novo Curso, Template ou Produto na Vitrine</h2>
+            <h2 class="text-sm font-extrabold text-[#0A2540] uppercase tracking-wider mb-4 text-center">+ Cadastrar Produto / Curso na Vitrine</h2>
             <form method="POST" action="/admin/add-item" class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <input type="text" name="term_br" required placeholder="Título em Português (ex: Curso IA para Clínicas)" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs">
-                <input type="text" name="term_origin" required placeholder="Nome Original EUA/Europa (ex: AI Clinic System)" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs">
+                <input type="text" name="term_br" required placeholder="Título na Vitrine (ex: Creatina Pura 300g)" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs">
+                <input type="text" name="term_origin" required placeholder="Termo de Busca / Original" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs">
+                <select name="region_combo" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold">
+                    <option value="Brasil|Brasil 🇧🇷">🇧🇷 Brasil (Mais Vendidos & Buscados)</option>
+                    <option value="América do Sul|Argentina 🇦🇷">🇦🇷 América do Sul (Argentina)</option>
+                    <option value="América do Sul|Chile 🇨🇱">🇨🇱 América do Sul (Chile)</option>
+                    <option value="América do Sul|Colômbia 🇨🇴">🇨🇴 América do Sul (Colômbia)</option>
+                    <option value="América do Sul|Uruguai 🇺🇾">🇺🇾 América do Sul (Uruguai)</option>
+                    <option value="Estados Unidos|Estados Unidos 🇺🇸">🇺🇸 Estados Unidos</option>
+                    <option value="Europa|Europa (Reino Unido) 🇬🇧">🇬🇧 Europa (Reino Unido)</option>
+                    <option value="Europa|Europa (Alemanha) 🇩🇪">🇩🇪 Europa (Alemanha)</option>
+                </select>
                 <select name="format_type" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold">
+                    <option value="Produtos Validados">Produtos Validados</option>
                     <option value="Cursos & IA">Cursos & IA</option>
                     <option value="Templates & Planilhas">Templates & Planilhas</option>
-                    <option value="Produtos Validados">Produtos Validados</option>
                 </select>
-                <select name="region" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold">
-                    <option value="Estados Unidos 🇺🇸">Estados Unidos 🇺🇸</option>
-                    <option value="Europa (Reino Unido) 🇬🇧">Europa (Reino Unido) 🇬🇧</option>
-                    <option value="Europa (Alemanha) 🇩🇪">Europa (Alemanha) 🇩🇪</option>
-                </select>
-                <input type="url" name="affiliate_url" required placeholder="Seu Link de Venda (Kiwify, Hotmart, Amazon...)" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs">
-                <input type="text" name="description" required placeholder="Resumo curto do benefício para o cliente" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs">
-                <button type="submit" class="md:col-span-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl text-xs transition">Publicar Imediatamente na Vitrine</button>
+                <input type="url" name="affiliate_url" required placeholder="Link de Venda / Afiliado (Shopee, Amazon, Kiwify...)" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs">
+                <input type="text" name="description" required placeholder="Benefício curto ou destaque de buscas" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs">
+                <button type="submit" class="md:col-span-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl text-xs transition">Publicar na Vitrine</button>
             </form>
         </div>
 
-        <!-- Lista de Oportunidades -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             {% for item in items %}
             <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                 <div class="flex justify-between items-center mb-2">
-                    <span class="text-xs font-bold text-sky-600">{{ item[3] }} • {{ item[4] }}</span>
+                    <span class="text-xs font-bold text-sky-600">{{ item[4] }} • {{ item[5] }}</span>
                     <div class="flex items-center gap-2">
-                        <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-extrabold px-2.5 py-0.5 rounded-full">Gap: {{ item[7] }}/100</span>
-                        <a href="/admin/delete/{{ item[0] }}" onclick="return confirm('Remover este item da vitrine?')" class="text-xs text-red-500 hover:text-red-700 font-bold px-1.5">✕</a>
+                        <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-extrabold px-2.5 py-0.5 rounded-full">Score: {{ item[9] }}/100</span>
+                        <a href="/admin/delete/{{ item[0] }}" onclick="return confirm('Remover item?')" class="text-xs text-red-500 font-bold px-1.5">✕</a>
                     </div>
                 </div>
                 <h3 class="text-base font-extrabold text-[#0A2540]">{{ item[2] }}</h3>
-                <p class="text-xs text-slate-500 mt-1">{{ item[5] }}</p>
-                <p class="text-[11px] text-slate-400 mt-1 mb-3">Original: <b>{{ item[1] }}</b> | Concorrentes BR: <b>{{ item[6] }}</b></p>
-                <form method="POST" action="/admin/update-link/{{ item[0] }}" class="flex gap-2 mb-3">
-                    <input type="url" name="affiliate_url" value="{{ item[10] }}" placeholder="Cole seu link Kiwify / Hotmart / Afiliado" class="flex-1 bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs">
+                <p class="text-xs text-slate-500 mt-1 mb-3">{{ item[6] }}</p>
+                <form method="POST" action="/admin/update-link/{{ item[0] }}" class="flex gap-2">
+                    <input type="url" name="affiliate_url" value="{{ item[12] }}" class="flex-1 bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs">
                     <button type="submit" class="bg-[#0A2540] hover:bg-emerald-600 text-white font-bold px-3.5 py-2 rounded-lg text-xs transition">Salvar Link</button>
                 </form>
-                <div class="flex gap-2 text-xs font-semibold">
-                    <a href="{{ item[8] }}" target="_blank" class="flex-1 text-center bg-slate-100 py-2 rounded-lg hover:bg-slate-200">Ver Fonte Original</a>
-                    <a href="{{ item[9] }}" target="_blank" class="flex-1 text-center bg-slate-100 py-2 rounded-lg hover:bg-slate-200">Checar Mercado BR</a>
-                </div>
             </div>
             {% endfor %}
         </div>
@@ -425,7 +452,7 @@ ADMIN_HTML = """
 def public_home():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("SELECT * FROM opportunities WHERE gap_score >= 65 ORDER BY id DESC LIMIT 60")
+    c.execute("SELECT * FROM opportunities ORDER BY id DESC LIMIT 100")
     items = c.fetchall()
     conn.close()
     return render_template_string(PUBLIC_HTML, items=items)
@@ -434,7 +461,7 @@ def public_home():
 def admin_login():
     ip = request.headers.get("X-Forwarded-For", request.remote_addr)
     if is_ip_blocked(ip):
-        return render_template_string(LOGIN_HTML, error="Muitas tentativas incorretas. IP bloqueado por 30 minutos."), 429
+        return render_template_string(LOGIN_HTML, error="IP bloqueado por 30 minutos."), 429
     if request.method == "POST":
         if request.form.get("password") == ADMIN_PASSWORD:
             FAILED_LOGINS.pop(ip, None)
@@ -454,7 +481,7 @@ def admin_logout():
 def admin_dashboard():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("SELECT * FROM opportunities ORDER BY id DESC LIMIT 80")
+    c.execute("SELECT * FROM opportunities ORDER BY id DESC LIMIT 120")
     items = c.fetchall()
     conn.close()
     return render_template_string(ADMIN_HTML, items=items)
@@ -464,8 +491,8 @@ def admin_dashboard():
 def add_item():
     term_br = request.form.get("term_br", "").strip()
     term_origin = request.form.get("term_origin", "").strip()
-    fmt = request.form.get("format_type", "Cursos & IA").strip()
-    region = request.form.get("region", "Estados Unidos 🇺🇸").strip()
+    continent, region = request.form.get("region_combo", "Brasil|Brasil 🇧🇷").split("|")
+    fmt = request.form.get("format_type", "Produtos Validados").strip()
     aff_url = request.form.get("affiliate_url", "").strip()
     desc = request.form.get("description", "").strip()
     if term_br and term_origin and aff_url:
@@ -474,9 +501,9 @@ def add_item():
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         c.execute('''
-            INSERT OR REPLACE INTO opportunities (term_origin, term_br, region, format_type, description, br_listings, gap_score, origin_url, br_url, affiliate_url, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (term_origin, term_br, region, fmt, desc, 1, 95, origin_url, br_url, aff_url, datetime.now().strftime("%d/%m/%Y %H:%M")))
+            INSERT OR REPLACE INTO opportunities (term_origin, term_br, continent, region, format_type, description, channel_metric, br_listings, gap_score, origin_url, br_url, affiliate_url, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (term_origin, term_br, continent, region, fmt, desc, f"Destaque {region}", 5, 95, origin_url, br_url, aff_url, datetime.now().strftime("%d/%m/%Y %H:%M")))
         conn.commit()
         conn.close()
     return redirect(url_for("admin_dashboard"))
@@ -506,15 +533,16 @@ def delete_item(item_id):
 @app.route("/admin/run-now")
 @login_required
 def run_now():
-    threading.Thread(target=run_radar_cycle).start()
+    threading.Thread(target=run_radar_cycle, args=("geral",)).start()
     return redirect(url_for("admin_dashboard"))
 
 @app.route("/scan")
 def cron_scan():
     if request.args.get("key") != CRON_SECRET_KEY:
         return jsonify({"error": "unauthorized"}), 401
-    threading.Thread(target=run_radar_cycle).start()
-    return jsonify({"status": "ok", "time": str(datetime.now())})
+    nicho = request.args.get("nicho", "geral").strip()
+    threading.Thread(target=run_radar_cycle, args=(nicho,)).start()
+    return jsonify({"status": "ok", "pesquisa": nicho, "time": str(datetime.now())})
 
 @app.route("/ping")
 def ping():
