@@ -329,7 +329,7 @@ LOGO_SVG = """
 """
 
 # --- 1. VITRINE PÚBLICA COM VALORES EM AMARELO-OURO DE ALTA DETECÇÃO VISUAL ---
-PUBLIC_HTML = """
+PUBLIC_HTML = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -434,7 +434,9 @@ PUBLIC_HTML = """
     <!-- CATÁLOGO COMPLETO (SEM REPETIR O TOP 3) -->
     <main class="max-w-5xl mx-auto px-4 pb-16">
         <div class="text-center mb-6">
-            <h2 class="text-sm font-extrabold uppercase tracking-wider text-slate-500">Catálogo Completo Monitorado ({{{{ items|length }}}} Oportunidades)</h2>
+            <h2 class="text-sm font-extrabold uppercase tracking-wider text-slate-500">
+                Catálogo Completo Monitorado (<span id="visibleCount">{{{{ items|length }}}}</span> Oportunidades)
+            </h2>
         </div>
         <div id="cardsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
             {{% for item in items %}}
@@ -469,4 +471,331 @@ PUBLIC_HTML = """
                 </div>
                 <div class="px-5 pb-5">
                     <a href="{{{{ item[20] }}}}" target="_blank" class="block w-full bg-[#0A2540] hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">
-                        {{{{ 'Acessar Treinamento / Ferramenta →' if item[5] == 'Cursos & IA' else ('Baixar Modelo Pronto →' if item[5] == 'Templates & Planilhas' else 'Conferir Menor
+                        {{{{ 'Acessar Treinamento / Ferramenta →' if item[5] == 'Cursos & IA' else ('Baixar Modelo Pronto →' if item[5] == 'Templates & Planilhas' else 'Conferir Menor Preço →') }}}}
+                    </a>
+                </div>
+            </div>
+            {{% endfor %}}
+        </div>
+        <div id="emptyState" class="hidden text-center py-12 bg-white rounded-2xl border border-slate-200 mt-4">
+            <p class="text-slate-600 font-bold text-sm">Nenhuma oportunidade encontrada com essa combinação de filtros.</p>
+            <button onclick="resetFilters()" class="mt-3 text-xs font-bold text-emerald-600 hover:underline">Limpar todos os filtros</button>
+        </div>
+    </main>
+
+    <footer class="border-t border-slate-200 bg-white py-8 px-4 text-center text-xs text-slate-500">
+        <p class="font-bold text-[#0A2540]">FARO GLOBAL • Inteligência Comercial & Curadoria de Tendências</p>
+        <p class="mt-1">Monitoramento contínuo no Brasil, América do Sul, Estados Unidos e Europa.</p>
+    </footer>
+
+    <script>
+        let currentCont = 'ALL';
+        let currentCat = 'ALL';
+        let currentOffer = 'ALL';
+
+        function setContinent(val, btn) {{
+            currentCont = val;
+            document.querySelectorAll('.cont-btn').forEach(b => {{
+                b.className = 'cont-btn bg-white text-slate-600 border border-slate-200 hover:border-slate-400 px-4 py-2 rounded-full transition';
+            }});
+            btn.className = 'cont-btn bg-[#0A2540] text-white px-4 py-2 rounded-full transition';
+            filterCards();
+        }}
+
+        function setCategory(val, btn) {{
+            currentCat = val;
+            document.querySelectorAll('.cat-btn').forEach(b => {{
+                b.className = 'cat-btn bg-white text-slate-600 border border-slate-200 hover:border-slate-400 px-3.5 py-1.5 rounded-full transition';
+            }});
+            btn.className = 'cat-btn bg-slate-800 text-white px-3.5 py-1.5 rounded-full transition';
+            filterCards();
+        }}
+
+        function setOffer(val, btn) {{
+            currentOffer = val;
+            document.querySelectorAll('.offer-btn').forEach(b => {{
+                b.className = 'offer-btn bg-white text-slate-600 border border-slate-200 hover:border-amber-400 px-3 py-1 rounded-full transition';
+            }});
+            btn.className = 'offer-btn bg-amber-400 text-slate-950 border border-amber-500 px-3 py-1 rounded-full transition';
+            filterCards();
+        }}
+
+        function filterCards() {{
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.opp-card');
+            let visible = 0;
+
+            cards.forEach(card => {{
+                const cont = card.getAttribute('data-cont');
+                const cat = card.getAttribute('data-cat');
+                const offer = card.getAttribute('data-offer');
+                const text = card.getAttribute('data-text');
+
+                const matchCont = (currentCont === 'ALL' || cont === currentCont);
+                const matchCat = (currentCat === 'ALL' || cat === currentCat);
+                const matchOffer = (currentOffer === 'ALL' || offer === currentOffer);
+                const matchText = (!query || text.includes(query));
+
+                if (matchCont && matchCat && matchOffer && matchText) {{
+                    card.style.display = 'flex';
+                    visible++;
+                }} else {{
+                    card.style.display = 'none';
+                }}
+            }});
+
+            document.getElementById('visibleCount').innerText = visible;
+            document.getElementById('emptyState').style.display = visible === 0 ? 'block' : 'none';
+        }}
+
+        function resetFilters() {{
+            document.getElementById('searchInput').value = '';
+            currentCont = 'ALL';
+            currentCat = 'ALL';
+            currentOffer = 'ALL';
+            filterCards();
+        }}
+    </script>
+</body>
+</html>
+"""
+
+# --- 2. TELA DE LOGIN ADMINISTRATIVO ---
+LOGIN_HTML = """
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin • Faro Global</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-slate-800 border border-slate-700 rounded-2xl p-7 shadow-xl">
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-black tracking-tight text-white">FARO <span class="text-emerald-400">GLOBAL</span></h1>
+            <p class="text-xs text-slate-400 mt-1">Acesso Restrito • Painel de Controle</p>
+        </div>
+        {% if error %}
+        <div class="bg-red-500/20 border border-red-500/50 text-red-200 text-xs font-semibold p-3 rounded-xl mb-4 text-center">
+            {{ error }}
+        </div>
+        {% endif %}
+        <form method="POST" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1.5">Senha Administrativa</label>
+                <input type="password" name="password" required placeholder="••••••••••••"
+                       class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-400">
+            </div>
+            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-3 rounded-xl text-sm transition">
+                Entrar no Painel →
+            </button>
+        </form>
+        <div class="mt-5 text-center">
+            <a href="/" class="text-xs text-slate-400 hover:text-white transition">← Voltar para a Vitrine Pública</a>
+        </div>
+    </div>
+</body>
+</html>
+"""
+
+# --- 3. PAINEL ADMINISTRATIVO COMPLETO ---
+ADMIN_HTML = """
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin • Faro Global</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-900 font-sans antialiased">
+    <header class="bg-[#0A2540] text-white py-4 px-6 shadow">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <h1 class="text-lg font-black tracking-tight">FARO <span class="text-emerald-400">GLOBAL</span> • ADMIN</h1>
+                <p class="text-[11px] text-slate-300">Gestão de Oportunidades, Links de Afiliado & Varredura 24h</p>
+            </div>
+            <div class="flex items-center gap-3 text-xs font-bold">
+                <a href="/" target="_blank" class="bg-white/10 hover:bg-white/20 px-3.5 py-2 rounded-lg transition">Ver Vitrine ↗</a>
+                <a href="/admin/logout" class="bg-red-500/80 hover:bg-red-600 px-3.5 py-2 rounded-lg transition">Sair</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+        {% if msg %}
+        <div class="bg-emerald-100 border border-emerald-400 text-emerald-900 px-4 py-3 rounded-xl text-xs font-bold">
+            {{ msg }}
+        </div>
+        {% endif %}
+
+        <!-- CONTROLE DO RADAR AUTOMÁTICO -->
+        <section class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <h2 class="text-sm font-black uppercase tracking-wider text-[#0A2540] mb-3">📡 Disparar Varredura Manual (Radar 24h)</h2>
+            <div class="flex flex-wrap gap-2.5 text-xs font-bold">
+                <form method="POST" action="/admin/scan">
+                    <input type="hidden" name="nicho" value="geral">
+                    <button type="submit" class="bg-[#0A2540] hover:bg-slate-800 text-white px-4 py-2.5 rounded-xl transition">🌍 Varredura Global Completa</button>
+                </form>
+                <form method="POST" action="/admin/scan">
+                    <input type="hidden" name="nicho" value="brasil">
+                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl transition">🇧🇷 Somente Brasil</button>
+                </form>
+                <form method="POST" action="/admin/scan">
+                    <input type="hidden" name="nicho" value="ia">
+                    <button type="submit" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2.5 rounded-xl transition">🤖 Foco Cursos & IA</button>
+                </form>
+                <form method="POST" action="/admin/scan">
+                    <input type="hidden" name="nicho" value="planilhas">
+                    <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-4 py-2.5 rounded-xl transition">📊 Foco Planilhas & Notion</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ADICIONAR NOVA OPORTUNIDADE MANUAL -->
+        <section class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <h2 class="text-sm font-black uppercase tracking-wider text-[#0A2540] mb-4">➕ Cadastrar Nova Oportunidade / Produto Afiliado</h2>
+            <form method="POST" action="/admin/add" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                <input type="text" name="term_br" required placeholder="Título Comercial (Ex: Creatina Pura 300g)" class="border border-slate-300 rounded-xl px-3.5 py-2.5">
+                <input type="text" name="term_origin" required placeholder="Termo Original / Único (Ex: Creatina 300g BR)" class="border border-slate-300 rounded-xl px-3.5 py-2.5">
+                <select name="continent" class="border border-slate-300 rounded-xl px-3.5 py-2.5">
+                    <option value="Brasil">Brasil</option>
+                    <option value="Estados Unidos">Estados Unidos</option>
+                    <option value="Europa">Europa</option>
+                    <option value="América do Sul">América do Sul</option>
+                </select>
+                <input type="text" name="region" value="Brasil 🇧🇷" placeholder="Rótulo Região (Ex: Brasil 🇧🇷)" class="border border-slate-300 rounded-xl px-3.5 py-2.5">
+                <select name="format_type" class="border border-slate-300 rounded-xl px-3.5 py-2.5">
+                    <option value="Produtos Validados">Produtos Validados</option>
+                    <option value="Cursos & IA">Cursos & IA</option>
+                    <option value="Templates & Planilhas">Templates & Planilhas</option>
+                </select>
+                <select name="offer_tag" class="border border-slate-300 rounded-xl px-3.5 py-2.5">
+                    <option value="ticket_baixo">💸 Até R$ 100</option>
+                    <option value="recorrencia">🔄 Uso Diário & Recompra</option>
+                    <option value="acesso_imediato">⚡ Acesso Digital Imediato</option>
+                    <option value="faixa_media">💎 R$ 100 – R$ 250</option>
+                </select>
+                <input type="text" name="price_prefix" value="A partir de" placeholder="Prefixo (Ex: A partir de / Modalidade)" class="border border-slate-300 rounded-xl px-3.5 py-2.5">
+                <input type="text" name="price_value" value="R$ 79" placeholder="Valor (Ex: R$ 79 ou ACESSO IMEDIATO)" class="border border-slate-300 rounded-xl px-3.5 py-2.5">
+                <input type="text" name="social_proof" value="★ 4.9 • Validado • Alta Conversão" placeholder="Prova Social" class="border border-slate-300 rounded-xl px-3.5 py-2.5">
+                <input type="url" name="image_url" value="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80" placeholder="URL da Imagem" class="border border-slate-300 rounded-xl px-3.5 py-2.5 md:col-span-2">
+                <label class="flex items-center gap-2 font-bold text-slate-700 px-2">
+                    <input type="checkbox" name="is_featured" value="1" class="w-4 h-4"> Destacar no Top 3
+                </label>
+                <input type="url" name="affiliate_url" required placeholder="Link de Afiliado / Checkout (https://...)" class="border border-slate-300 rounded-xl px-3.5 py-2.5 md:col-span-2">
+                <input type="text" name="description" required placeholder="Descrição curta persuasiva para o card" class="border border-slate-300 rounded-xl px-3.5 py-2.5">
+                <button type="submit" class="md:col-span-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl transition">
+                    Salvar na Vitrine →
+                </button>
+            </form>
+        </section>
+
+        <!-- LISTA DE PRODUTOS CADASTRADOS -->
+        <section class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm overflow-x-auto">
+            <h2 class="text-sm font-black uppercase tracking-wider text-[#0A2540] mb-4">📦 Itens Ativos na Vitrine ({{ items|length }})</h2>
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                    <tr class="border-b border-slate-200 text-slate-500 uppercase">
+                        <th class="py-2.5 px-2">Top 3</th>
+                        <th class="py-2.5 px-2">Produto / Termo BR</th>
+                        <th class="py-2.5 px-2">Mercado / Cat.</th>
+                        <th class="py-2.5 px-2">Preço & Link Afiliado</th>
+                        <th class="py-2.5 px-2 text-right">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for item in items %}
+                    <tr class="hover:bg-slate-50">
+                        <td class="py-3 px-2">
+                            <form method="POST" action="/admin/toggle_featured/{{ item[0] }}">
+                                <button type="submit" class="px-2.5 py-1 rounded-full font-black {{ 'bg-amber-400 text-slate-950' if item[15] == 1 else 'bg-slate-200 text-slate-600' }}">
+                                    {{ '🔥 SIM' if item[15] == 1 else 'Não' }}
+                                </button>
+                            </form>
+                        </td>
+                        <td class="py-3 px-2">
+                            <div class="font-bold text-[#0A2540]">{{ item[2] }}</div>
+                            <div class="text-[11px] text-slate-400">{{ item[10] }} • {{ item[21] }}</div>
+                        </td>
+                        <td class="py-3 px-2">
+                            <div class="font-semibold">{{ item[4] }}</div>
+                            <div class="text-[11px] text-emerald-700">{{ item[5] }}</div>
+                        </td>
+                        <td class="py-3 px-2">
+                            <form method="POST" action="/admin/update/{{ item[0] }}" class="flex flex-wrap items-center gap-1.5">
+                                <input type="text" name="price_value" value="{{ item[12] }}" class="w-28 border border-slate-300 rounded-lg px-2 py-1 font-bold">
+                                <input type="url" name="affiliate_url" value="{{ item[20] }}" class="w-48 border border-slate-300 rounded-lg px-2 py-1">
+                                <button type="submit" class="bg-[#0A2540] text-white px-2.5 py-1 rounded-lg font-bold hover:bg-emerald-600">Salvar</button>
+                            </form>
+                        </td>
+                        <td class="py-3 px-2 text-right">
+                            <form method="POST" action="/admin/delete/{{ item[0] }}" onsubmit="return confirm('Remover este item da vitrine?');">
+                                <button type="submit" class="text-red-600 hover:underline font-bold">Excluir</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
+</body>
+</html>
+"""
+
+# --- ROTAS DA APLICAÇÃO ---
+@app.route("/")
+def index():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT * FROM opportunities WHERE is_featured = 1 ORDER BY gap_score DESC, id DESC LIMIT 3")
+    featured_items = c.fetchall()
+    c.execute("SELECT * FROM opportunities WHERE is_featured = 0 ORDER BY gap_score DESC, id DESC")
+    items = c.fetchall()
+    conn.close()
+    return render_template_string(PUBLIC_HTML, featured_items=featured_items, items=items)
+
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+    ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+    if is_ip_blocked(ip):
+        return render_template_string(LOGIN_HTML, error="Muitas tentativas falhas. Tente novamente em 30 minutos."), 429
+
+    if request.method == "POST":
+        password = request.form.get("password", "")
+        if password == ADMIN_PASSWORD:
+            session["admin_logged_in"] = True
+            return redirect(url_for("admin_panel"))
+        register_failed_login(ip)
+        return render_template_string(LOGIN_HTML, error="Senha incorreta."), 401
+
+    return render_template_string(LOGIN_HTML, error=None)
+
+@app.route("/admin/logout")
+def admin_logout():
+    session.clear()
+    return redirect(url_for("index"))
+
+@app.route("/admin")
+@login_required
+def admin_panel():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT * FROM opportunities ORDER BY is_featured DESC, id DESC")
+    items = c.fetchall()
+    conn.close()
+    msg = request.args.get("msg")
+    return render_template_string(ADMIN_HTML, items=items, msg=msg)
+
+@app.route("/admin/scan", methods=["POST"])
+@login_required
+def admin_scan():
+    nicho = request.form.get("nicho", "geral")
+    threading.Thread(target=run_radar_cycle, args=(nicho,), daemon=True).start()
+    return redirect(url_for("admin_panel", msg=f"Varredura '{nicho.upper()}' iniciada em segundo plano! Atualize a página em alguns segundos."))
+
+@app.route("/admin/add", methods=["POST"])
+@login_required
+def admin_add():
+    term_br = request.form.get("term_br", "").strip()
+    term_origin = request.form.get("
