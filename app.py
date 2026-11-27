@@ -329,7 +329,7 @@ LOGO_SVG = """
 """
 
 # --- 1. VITRINE PÚBLICA COM VALORES EM AMARELO-OURO DE ALTA DETECÇÃO VISUAL ---
-PUBLIC_HTML = f"""
+PUBLIC_HTML = """
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
