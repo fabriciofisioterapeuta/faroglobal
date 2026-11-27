@@ -16,7 +16,7 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY", "faroglobal-secret-key-2026"
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "Admin@2026!")
 CRON_SECRET_KEY = os.environ.get("CRON_SECRET_KEY", "radar2026")
 VIP_CHANNEL_URL = os.environ.get("VIP_CHANNEL_URL", "https://t.me/")
-DB_PATH = "faroglobal_v6.db"
+DB_PATH = "faroglobal_v7.db"
 
 # --- PROTEÇÃO ANTI-FORÇA BRUTA ---
 FAILED_LOGINS = {}
@@ -48,7 +48,7 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated
 
-# --- BANCO DE DADOS COMPLETO ---
+# --- BANCO DE DADOS COMPLETO (21 PRODUTOS + PREÇO PADRONIZADO + FILTROS DE OFERTA) ---
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -60,11 +60,14 @@ def init_db():
             continent TEXT,
             region TEXT,
             format_type TEXT,
+            offer_tag TEXT,
             description TEXT,
             why_trending TEXT,
             target_audience TEXT,
             source_name TEXT,
-            price_badge TEXT,
+            price_prefix TEXT,
+            price_value TEXT,
+            social_proof TEXT,
             image_url TEXT,
             is_featured INTEGER DEFAULT 0,
             gap_score INTEGER,
@@ -80,34 +83,43 @@ def init_db():
     c.execute("SELECT COUNT(*) FROM opportunities")
     if c.fetchone()[0] == 0:
         seed_items = [
-            # BRASIL
-            ("Creatina Monohidratada Pura 300g", "Creatina Monohidratada Pura (Campeã de Buscas)", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Suplemento nº 1 em pedidos recorrentes para ganho de força e recuperação muscular nos marketplaces.", "Alta taxa de recompra mensal (ciclo de 30 dias) e forte procura orgânica.", "Praticantes de musculação, corredores e público fitness.", "Google Trends BR + Autocomplete", "A partir de R$ 59 • ★ 4.9 (10k+ vendidos)", "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?auto=format&fit=crop&w=800&q=80", 1, 97, "https://trends.google.com.br/trends/explore?geo=BR&q=Creatina%20Monohidratada", "https://lista.mercadolivre.com.br/creatina-monohidratada-pura", "https://www.amazon.com.br/s?k=creatina+monohidratada+pura", "https://www.amazon.com.br/s?k=creatina+monohidratada+pura", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Mini Projetor Portátil 4K Wi-Fi", "Mini Projetor Smart Portátil Full HD / 4K com Wi-Fi", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Transforme qualquer parede em tela de cinema ou apresentação sem precisar de cabos ou computador.", "Alta viralização em vídeos curtos com excelente conversão no Brasil.", "Famílias, gamers, estudantes e profissionais externos.", "Radar Ofertas Quentes BR", "Faixa de R$ 229 • ★ 4.8 (Viral BR)", "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=800&q=80", 1, 94, "https://trends.google.com.br/trends/explore?geo=BR&q=Mini%20Projetor%20Portatil", "https://lista.mercadolivre.com.br/mini-projetor-portatil-wifi", "https://shopee.com.br/search?keyword=mini%20projetor%20portatil", "https://shopee.com.br/search?keyword=mini%20projetor%20portatil", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Air Fryer Digital & Acessórios", "Kit Formas de Silicone & Acessórios para Air Fryer", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Evite sujeira e preserve o antiaderente do cesto com formas reutilizáveis de fácil limpeza.", "Compra por impulso de ticket baixo com altíssimo volume diário.", "Donos de fritadeira elétrica e compradores de utilidades domésticas.", "Google Autocomplete BR", "A partir de R$ 29 • ★ 4.8 (+50k pedidos)", "https://images.unsplash.com/photo-1585515320310-259814833e62?auto=format&fit=crop&w=800&q=80", 0, 95, "https://trends.google.com.br/trends/explore?geo=BR&q=Forma%20Silicone%20Air%20Fryer", "https://lista.mercadolivre.com.br/forma-silicone-air-fryer", "https://shopee.com.br/search?keyword=forma%20silicone%20air%20fryer", "https://shopee.com.br/search?keyword=forma%20silicone%20air%20fryer", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Fone Bluetooth TWS ANC", "Fone de Ouvido Sem Fio TWS com Cancelamento de Ruído", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Isole barulhos externos em treinos, viagens ou reuniões com bateria de longa duração.", "Alta procura diária para academia, corridas e reuniões online.", "Praticantes de esportes, estudantes e trabalhadores remotos.", "Google Trends BR + Ofertas", "Faixa de R$ 89 • ★ 4.8 (Top Áudio BR)", "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=800&q=80", 0, 93, "https://trends.google.com.br/trends/explore?geo=BR&q=Fone%20Bluetooth%20TWS", "https://lista.mercadolivre.com.br/fone-bluetooth-tws-anc", "https://www.amazon.com.br/s?k=fone+bluetooth+tws+anc", "https://www.amazon.com.br/s?k=fone+bluetooth+tws+anc", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Sérum Facial Vitamina C & Ácido Hialurônico", "Kit Skincare Sérum Vitamina C + Ácido Hialurônico", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Rotina prática de hidratação profunda e uniformização da pele com alta recompra recorrente.", "Forte engajamento orgânico e alta taxa de recompra a cada 45 dias.", "Público interessado em cuidados com a pele e estética facial.", "Google Autocomplete BR", "A partir de R$ 44 • ★ 4.9 (Top Beleza)", "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80", 0, 92, "https://trends.google.com.br/trends/explore?geo=BR&q=Serum%20Vitamina%20C", "https://lista.mercadolivre.com.br/serum-vitamina-c-acido-hialuronico", "https://www.amazon.com.br/s?k=serum+vitamina+c+acido+hialuronico", "https://www.amazon.com.br/s?k=serum+vitamina+c+acido+hialuronico", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Smartwatch Esportivo GPS", "Relógio Inteligente Esportivo com Monitor Cardíaco e GPS", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Acompanhe ritmo, distância e batimentos sem depender do celular durante corridas e treinos.", "Crescimento contínuo das assessorias de corrida e provas de rua no Brasil.", "Corredores de rua, ciclistas e entusiastas de saúde.", "Radar Ofertas Quentes BR", "Faixa de R$ 179 • ★ 4.8 (Fitness BR)", "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?auto=format&fit=crop&w=800&q=80", 0, 91, "https://trends.google.com.br/trends/explore?geo=BR&q=Smartwatch%20GPS%20Corrida", "https://lista.mercadolivre.com.br/smartwatch-esportivo-gps", "https://www.amazon.com.br/s?k=smartwatch+esportivo+gps", "https://www.amazon.com.br/s?k=smartwatch+esportivo+gps", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Curso Automação WhatsApp & IA BR", "Formação Prática de IA & Automação Comercial no WhatsApp", "Brasil", "Brasil 🇧🇷", "Cursos & IA", "Atenda leads 24h, agende horários e qualifique clientes no WhatsApp sem aumentar equipe.", "Demanda crescente por redução de custos operacionais com agentes de IA.", "Donos de negócios locais, clínicas, infoprodutores e gestores.", "Google Autocomplete BR", "Acesso Imediato • ★ 4.9 (Hotmart/Kiwify)", "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80", 0, 96, "https://trends.google.com.br/trends/explore?geo=BR&q=Automacao%20WhatsApp%20IA", "https://lista.mercadolivre.com.br/curso-automacao-whatsapp", "https://hotmart.com/pt-br/marketplace/produtos?q=automacao+whatsapp+ia", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Planilha Controle Financeiro 2026 BR", "Planilha Automática de Finanças Pessoais & Investimentos", "Brasil", "Brasil 🇧🇷", "Templates & Planilhas", "Controle entradas, gastos fixos, metas e aportes em um painel automático pronto para usar.", "Produto digital de entrega imediata e altíssima conversão no início e fim de mês.", "Assalariados, autônomos, casais e investidores iniciantes.", "Google Autocomplete BR", "A partir de R$ 37 • Entrega Imediata", "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=800&q=80", 0, 91, "https://trends.google.com.br/trends/explore?geo=BR&q=Planilha%20Controle%20Financeiro", "https://lista.mercadolivre.com.br/planilha-controle-financeiro", "https://hotmart.com/pt-br/marketplace/produtos?q=planilha+controle+financeiro", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            # TOP 3 DESTAQUES DA SEMANA
+            ("Creatina Monohidratada Pura 300g", "Creatina Monohidratada Pura (Campeã de Buscas)", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "ticket_baixo", "Suplemento nº 1 em pedidos recorrentes e buscas diárias nos marketplaces brasileiros.", "Alta taxa de recompra mensal (ciclo de 30 dias) e forte procura orgânica.", "Praticantes de musculação, corredores e público fitness.", "Google Trends BR + Autocomplete", "A partir de", "R$ 59", "★ 4.9 • +10k vendidos • Recompra mensal", "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?auto=format&fit=crop&w=800&q=80", 1, 97, "https://trends.google.com.br/trends/explore?geo=BR&q=Creatina%20Monohidratada", "https://lista.mercadolivre.com.br/creatina-monohidratada-pura", "https://www.amazon.com.br/s?k=creatina+monohidratada+pura", "https://www.amazon.com.br/s?k=creatina+monohidratada+pura", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("AI Workflow Automation Course", "Curso Completo de Automação com IA (Sem Código)", "Estados Unidos", "Estados Unidos 🇺🇸", "Cursos & IA", "acesso_imediato", "Treinamento prático americano para automatizar atendimento e vendas usando agentes de IA.", "Explosão de buscas nos EUA por fluxos no n8n e Make com baixa oferta em português.", "Empreendedores digitais, gestores de tráfego e agências.", "Google Trends US", "Modalidade", "ACESSO VITALÍCIO", "★ 4.9 • Validado nos EUA • Sem mensalidade", "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80", 1, 96, "https://trends.google.com/trends/explore?geo=US&q=AI%20Workflow%20Automation", "https://lista.mercadolivre.com.br/curso-automacao-ia", "https://hotmart.com/pt-br/marketplace/produtos?q=automacao+ia", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Mini Projetor Portátil 4K Wi-Fi", "Mini Projetor Smart Portátil Full HD / 4K com Wi-Fi", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "faixa_media", "Fenômeno viral nas redes sociais e campeão de vendas para cinema em casa e apresentações.", "Alta viralização em vídeos curtos com excelente conversão no Brasil.", "Famílias, gamers, estudantes e profissionais externos.", "Radar Ofertas Quentes BR", "Faixa de", "R$ 229", "★ 4.8 • Viral BR • Entrega rápida", "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=800&q=80", 1, 94, "https://trends.google.com.br/trends/explore?geo=BR&q=Mini%20Projetor%20Portatil", "https://lista.mercadolivre.com.br/mini-projetor-portatil-wifi", "https://shopee.com.br/search?keyword=mini%20projetor%20portatil", "https://shopee.com.br/search?keyword=mini%20projetor%20portatil", datetime.now().strftime("%d/%m/%Y %H:%M")),
+
+            # BRASIL (CATÁLOGO)
+            ("Air Fryer Digital & Acessórios", "Kit Formas de Silicone & Acessórios para Air Fryer", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "ticket_baixo", "Um dos itens mais pesquisados e vendidos na Shopee e Mercado Livre com altíssima conversão.", "Compra por impulso de ticket baixo com altíssimo volume diário.", "Donos de fritadeira elétrica e compradores de utilidades domésticas.", "Google Autocomplete BR", "A partir de", "R$ 29", "★ 4.8 • +50k pedidos • Ticket baixo", "https://images.unsplash.com/photo-1585515320310-259814833e62?auto=format&fit=crop&w=800&q=80", 0, 95, "https://trends.google.com.br/trends/explore?geo=BR&q=Forma%20Silicone%20Air%20Fryer", "https://lista.mercadolivre.com.br/forma-silicone-air-fryer", "https://shopee.com.br/search?keyword=forma%20silicone%20air%20fryer", "https://shopee.com.br/search?keyword=forma%20silicone%20air%20fryer", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Fone Bluetooth TWS ANC", "Fone de Ouvido Sem Fio TWS com Cancelamento de Ruído", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "ticket_baixo", "Líder absoluto em buscas de eletrônicos portáteis no Brasil com excelente custo-benefício.", "Alta procura diária para academia, corridas e reuniões online.", "Praticantes de esportes, estudantes e trabalhadores remotos.", "Google Trends BR + Ofertas", "Faixa de", "R$ 89", "★ 4.8 • Top Áudio BR • Uso diário", "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=800&q=80", 0, 93, "https://trends.google.com.br/trends/explore?geo=BR&q=Fone%20Bluetooth%20TWS", "https://lista.mercadolivre.com.br/fone-bluetooth-tws-anc", "https://www.amazon.com.br/s?k=fone+bluetooth+tws+anc", "https://www.amazon.com.br/s?k=fone+bluetooth+tws+anc", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Sérum Facial Vitamina C & Ácido Hialurônico", "Kit Skincare Sérum Vitamina C + Ácido Hialurônico", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "recorrencia", "Categoria de beleza com maior crescimento de buscas e recompra recorrente no Brasil.", "Forte engajamento orgânico e alta taxa de recompra a cada 45 dias.", "Público interessado em cuidados com a pele e estética facial.", "Google Autocomplete BR", "A partir de", "R$ 44", "★ 4.9 • Top Beleza • Recompra rápida", "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80", 0, 92, "https://trends.google.com.br/trends/explore?geo=BR&q=Serum%20Vitamina%20C", "https://lista.mercadolivre.com.br/serum-vitamina-c-acido-hialuronico", "https://www.amazon.com.br/s?k=serum+vitamina+c+acido+hialuronico", "https://www.amazon.com.br/s?k=serum+vitamina+c+acido+hialuronico", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Smartwatch Esportivo GPS", "Relógio Inteligente Esportivo com Monitor Cardíaco e GPS", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "faixa_media", "Alta procura entre praticantes de corrida de rua, academia e ciclismo em todo o país.", "Crescimento contínuo das assessorias de corrida e provas de rua no Brasil.", "Corredores de rua, ciclistas e entusiastas de saúde.", "Radar Ofertas Quentes BR", "Faixa de", "R$ 179", "★ 4.8 • Fitness BR • Alta procura", "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?auto=format&fit=crop&w=800&q=80", 0, 91, "https://trends.google.com.br/trends/explore?geo=BR&q=Smartwatch%20GPS%20Corrida", "https://lista.mercadolivre.com.br/smartwatch-esportivo-gps", "https://www.amazon.com.br/s?k=smartwatch+esportivo+gps", "https://www.amazon.com.br/s?k=smartwatch+esportivo+gps", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Pistola de Massagem Muscular", "Pistola Massageadora Profunda para Recuperação Muscular", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "faixa_media", "Sucesso entre atletas amadores, corredores e fisioterapeutas para alívio miofascial rápido.", "Excelente margem e alta percepção de valor como presente ou uso próprio.", "Corredores, praticantes de crossfit, academias e clínicas.", "Google Trends BR", "Faixa de", "R$ 119", "★ 4.8 • Recuperação • Bem avaliado", "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80", 0, 90, "https://trends.google.com.br/trends/explore?geo=BR&q=Pistola%20Massageadora%20Muscular", "https://lista.mercadolivre.com.br/pistola-massageadora-muscular", "https://www.amazon.com.br/s?k=pistola+massageadora+muscular", "https://www.amazon.com.br/s?k=pistola+massageadora+muscular", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Garrafa Térmica Inox 1L", "Garrafa Térmica Inteligente em Aço Inox Parede Dupla", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "recorrencia", "Item essencial no dia a dia de trabalho, academia e viagens com alta durabilidade.", "Produto perene com pico de buscas em épocas quentes.", "Estudantes, trabalhadores, atletas e viajantes.", "Google Autocomplete BR", "A partir de", "R$ 49", "★ 4.9 • +30k pedidos • Uso diário", "https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=800&q=80", 0, 89, "https://trends.google.com.br/trends/explore?geo=BR&q=Garrafa%20Termica%20Inox", "https://lista.mercadolivre.com.br/garrafa-termica-inox", "https://shopee.com.br/search?keyword=garrafa%20termica%20inox", "https://shopee.com.br/search?keyword=garrafa%20termica%20inox", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Curso Automação WhatsApp & IA BR", "Formação Prática de IA & Automação Comercial no WhatsApp", "Brasil", "Brasil 🇧🇷", "Cursos & IA", "acesso_imediato", "Treinamento mais procurado por empresas e profissionais que querem automatizar atendimento.", "Demanda crescente por redução de custos operacionais com agentes de IA.", "Donos de negócios locais, clínicas, infoprodutores e gestores.", "Google Autocomplete BR", "Modalidade", "ACESSO IMEDIATO", "★ 4.9 • Hotmart/Kiwify • Passo a passo", "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80", 0, 96, "https://trends.google.com.br/trends/explore?geo=BR&q=Automacao%20WhatsApp%20IA", "https://lista.mercadolivre.com.br/curso-automacao-whatsapp", "https://hotmart.com/pt-br/marketplace/produtos?q=automacao+whatsapp+ia", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Planilha Controle Financeiro 2026 BR", "Planilha Automática de Finanças Pessoais & Investimentos", "Brasil", "Brasil 🇧🇷", "Templates & Planilhas", "ticket_baixo", "Dashboard pronto em Excel e Google Sheets para organizar orçamento e metas mensais.", "Produto digital de entrega imediata e altíssima conversão no início e fim de mês.", "Assalariados, autônomos, casais e investidores iniciantes.", "Google Autocomplete BR", "A partir de", "R$ 37", "★ 4.9 • Entrega imediata • Excel & Sheets", "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=800&q=80", 0, 91, "https://trends.google.com.br/trends/explore?geo=BR&q=Planilha%20Controle%20Financeiro", "https://lista.mercadolivre.com.br/planilha-controle-financeiro", "https://hotmart.com/pt-br/marketplace/produtos?q=planilha+controle+financeiro", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
 
             # ESTADOS UNIDOS
-            ("AI Workflow Automation Course", "Curso Completo de Automação com IA (Sem Código)", "Estados Unidos", "Estados Unidos 🇺🇸", "Cursos & IA", "Monte fluxos automáticos de atendimento e tarefas repetitivas em horas usando n8n e Make.", "Explosão de buscas nos EUA por fluxos no n8n e Make com baixa oferta em português.", "Empreendedores digitais, gestores de tráfego e agências.", "Google Trends US", "Acesso Vitalício • ★ 4.9 (Validado EUA)", "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80", 1, 96, "https://trends.google.com/trends/explore?geo=US&q=AI%20Workflow%20Automation", "https://lista.mercadolivre.com.br/curso-automacao-ia", "https://hotmart.com/pt-br/marketplace/produtos?q=automacao+ia", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Prompt Engineering Masterclass", "Formação Engenharia de Prompts para Negócios", "Estados Unidos", "Estados Unidos 🇺🇸", "Cursos & IA", "Acelere relatórios, textos e análises diárias com comandos prontos para ChatGPT e Claude.", "Alta procura por profissionais buscando produtividade imediata.", "Redatores, advogados, médicos, professores e consultores.", "Google Trends US", "A partir de R$ 67 • ★ 4.8 (Top IA EUA)", "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=800&q=80", 0, 90, "https://trends.google.com/trends/explore?geo=US&q=Prompt%20Engineering", "https://lista.mercadolivre.com.br/curso-engenharia-de-prompts", "https://hotmart.com/pt-br/marketplace/produtos?q=engenharia+de+prompts", "https://hotmart.com", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Prompt Engineering Masterclass", "Formação Engenharia de Prompts para Negócios", "Estados Unidos", "Estados Unidos 🇺🇸", "Cursos & IA", "acesso_imediato", "Biblioteca de comandos prontos para extrair resultados profissionais de ChatGPT e Claude.", "Alta procura por profissionais buscando produtividade imediata.", "Redatores, advogados, médicos, professores e consultores.", "Google Trends US", "A partir de", "R$ 67", "★ 4.8 • Top IA EUA • Acesso imediato", "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=800&q=80", 0, 90, "https://trends.google.com/trends/explore?geo=US&q=Prompt%20Engineering", "https://lista.mercadolivre.com.br/curso-engenharia-de-prompts", "https://hotmart.com/pt-br/marketplace/produtos?q=engenharia+de+prompts", "https://hotmart.com", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("AI Video Dubbing & Avatar Studio", "Ferramenta de Dublagem & Vídeos com Avatares de IA", "Estados Unidos", "Estados Unidos 🇺🇸", "Cursos & IA", "acesso_imediato", "Plataforma americana que traduz vídeos com sincronia labial perfeita em segundos.", "Forte adoção por criadores de conteúdo e canais dark nos EUA.", "YouTubers, criadores de conteúdo, afiliados e professores.", "Product Hunt US", "Modalidade", "PLANO GRÁTIS + PRO", "★ 4.9 • Viral EUA • Uso online", "https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=800&q=80", 0, 92, "https://trends.google.com/trends/explore?geo=US&q=AI%20Video%20Dubbing", "https://lista.mercadolivre.com.br/dublagem-ia", "https://www.google.com/search?q=AI+Video+Dubbing+Tool", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
 
             # EUROPA
-            ("Notion Second Brain 2026 System", "Sistema Segundo Cérebro no Notion (Produtividade)", "Europa", "Europa (Reino Unido) 🇬🇧", "Templates & Planilhas", "Centralize projetos, tarefas, finanças e metas em um workspace duplicável com 1 clique.", "Custo zero de estoque e entrega imediata via link duplicável do Notion.", "Estudantes universitários, freelancers e criadores de conteúdo.", "Google Trends UK", "A partir de R$ 47 • Entrega Imediata", "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=800&q=80", 0, 91, "https://trends.google.com/trends/explore?geo=GB&q=Notion%20Second%20Brain", "https://lista.mercadolivre.com.br/template-notion", "https://www.notion.so/templates/search?query=second+brain", "https://hotmart.com", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Portable Espresso Maker Travel", "Cafeteira Portátil de Pressão para Viagem e Escritório", "Europa", "Europa (Alemanha) 🇩🇪", "Produtos Validados", "Extraia café expresso cremoso em qualquer lugar sem depender de tomada ou cápsulas caras.", "Vídeos de demonstração com alto engajamento na Alemanha e Itália.", "Viajantes frequentes, motoristas, campistas e amantes de café.", "Google Trends DE", "Faixa de R$ 189 • ★ 4.9 (Sucesso EU)", "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80", 0, 93, "https://trends.google.com/trends/explore?geo=DE&q=Portable%20Espresso%20Maker", "https://lista.mercadolivre.com.br/cafeteira-portatil-expresso", "https://pt.aliexpress.com/wholesale?SearchText=portable+espresso+maker", "https://www.amazon.com.br/s?k=cafeteira+portatil+expresso", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Notion Second Brain 2026 System", "Sistema Segundo Cérebro no Notion (Produtividade)", "Europa", "Europa (Reino Unido) 🇬🇧", "Templates & Planilhas", "ticket_baixo", "Template completo de gestão de projetos, finanças e metas pessoais com alta demanda na Europa.", "Custo zero de estoque e entrega imediata via link duplicável do Notion.", "Estudantes universitários, freelancers e criadores de conteúdo.", "Google Trends UK", "A partir de", "R$ 47", "★ 4.9 • Entrega imediata • Modelo Notion", "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=800&q=80", 0, 91, "https://trends.google.com/trends/explore?geo=GB&q=Notion%20Second%20Brain", "https://lista.mercadolivre.com.br/template-notion", "https://www.notion.so/templates/search?query=second+brain", "https://hotmart.com", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Portable Espresso Maker Travel", "Cafeteira Portátil de Pressão para Viagem e Escritório", "Europa", "Europa (Alemanha) 🇩🇪", "Produtos Validados", "faixa_media", "Gadget compacto que prepara café expresso sem eletricidade, viral em lojas europeias.", "Vídeos de demonstração com alto engajamento na Alemanha e Itália.", "Viajantes frequentes, motoristas, campistas e amantes de café.", "Google Trends DE", "Faixa de", "R$ 189", "★ 4.9 • Sucesso EU • Sem eletricidade", "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80", 0, 93, "https://trends.google.com/trends/explore?geo=DE&q=Portable%20Espresso%20Maker", "https://lista.mercadolivre.com.br/cafeteira-portatil-expresso", "https://pt.aliexpress.com/wholesale?SearchText=portable+espresso+maker", "https://www.amazon.com.br/s?k=cafeteira+portatil+expresso", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Smart Posture Corrector Sensor", "Corretor Postural Inteligente com Sensor de Vibração", "Europa", "Europa (Reino Unido) 🇬🇧", "Produtos Validados", "recorrencia", "Dispositivo discreto que vibra suavemente ao detectar má postura no computador.", "Grande procura entre trabalhadores em regime home office na Europa.", "Programadores, analistas, estudantes e trabalhadores de escritório.", "Google Trends UK", "Faixa de", "R$ 79", "★ 4.7 • Home Office • Uso diário", "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=800&q=80", 0, 88, "https://trends.google.com/trends/explore?geo=GB&q=Smart%20Posture%20Corrector", "https://lista.mercadolivre.com.br/corretor-postural-sensor", "https://pt.aliexpress.com/wholesale?SearchText=smart+posture+corrector", "https://www.amazon.com.br/s?k=corretor+postural+sensor", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Minimalist Desk Mat & Organizer", "Tapete de Mesa Ergonômico em Feltro & Organizador Setup", "Europa", "Europa (Alemanha) 🇩🇪", "Produtos Validados", "ticket_baixo", "Acessório minimalista campeão de buscas para organização de mesas de trabalho e estudo.", "Alta viralização em vídeos de setup minimalista e produtividade.", "Designers, editores, estudantes e profissionais de TI.", "Google Trends DE", "Faixa de", "R$ 69", "★ 4.8 • Setup Pro • Ticket baixo", "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=800&q=80", 0, 89, "https://trends.google.com/trends/explore?geo=DE&q=Felt%20Desk%20Mat", "https://lista.mercadolivre.com.br/desk-mat-feltro", "https://pt.aliexpress.com/wholesale?SearchText=felt+desk+mat", "https://www.amazon.com.br/s?k=desk+mat+feltro", datetime.now().strftime("%d/%m/%Y %H:%M")),
 
             # AMÉRICA DO SUL
-            ("Sistema Gestión Clínicas & Turnos AR", "Sistema Inteligente de Agendamento & Gestão de Clínicas", "América do Sul", "Argentina 🇦🇷", "Templates & Planilhas", "Organize agendas, histórico de pacientes e faturamento mensal sem planilhas bagunçadas.", "Forte adoção por clínicas pequenas e consultórios buscando reduzir faltas.", "Fisioterapeutas, dentistas, psicólogos e clínicas de estética.", "Google Trends AR", "A partir de R$ 67 • ★ 4.9 (LATAM)", "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80", 0, 92, "https://trends.google.com/trends/explore?geo=AR&q=gestion%20turnos%20clinicas", "https://lista.mercadolivre.com.br/planilha-gestao-clinica", "https://hotmart.com/pt-br/marketplace/produtos?q=gestao+clinica", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Kit Mate Térmico Acero Inox UY", "Garrafa Térmica Inox de Precisão & Kit Chimarrão/Mate", "América do Sul", "Uruguai 🇺🇾", "Produtos Validados", "Mantenha a temperatura ideal por horas com bico de precisão anti-respingos em aço inox.", "Alta demanda regional e ticket médio elevado com ótima comissão.", "Consumidores de chimarrão, tereré e bebidas térmicas.", "Tendência Sul-Americana", "Faixa de R$ 149 • ★ 4.9 (Top UY)", "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=800&q=80", 0, 90, "https://www.google.com/search?q=termo+mate+acero+inoxidable+uruguay", "https://lista.mercadolivre.com.br/garrafa-termica-inox-mate", "https://www.amazon.com.br/s?k=garrafa+termica+inox+mate", "https://www.amazon.com.br/s?k=garrafa+termica+inox+mate", datetime.now().strftime("%d/%m/%Y %H:%M"))
+            ("Sistema Gestión Clínicas & Turnos AR", "Sistema Inteligente de Agendamento & Gestão de Clínicas", "América do Sul", "Argentina 🇦🇷", "Templates & Planilhas", "acesso_imediato", "Plataforma/planilha argentina de controle de pacientes, agendas e faturamento recorrente.", "Forte adoção por clínicas pequenas e consultórios buscando reduzir faltas.", "Fisioterapeutas, dentistas, psicólogos e clínicas de estética.", "Google Trends AR", "A partir de", "R$ 67", "★ 4.9 • LATAM • Acesso imediato", "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80", 0, 92, "https://trends.google.com/trends/explore?geo=AR&q=gestion%20turnos%20clinicas", "https://lista.mercadolivre.com.br/planilha-gestao-clinica", "https://hotmart.com/pt-br/marketplace/produtos?q=gestao+clinica", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Kit Mate Térmico Acero Inox UY", "Garrafa Térmica Inox de Precisão & Kit Chimarrão/Mate", "América do Sul", "Uruguai 🇺🇾", "Produtos Validados", "faixa_media", "Modelo térmico de alta retenção de temperatura campeão de vendas no Uruguai e Sul do Brasil.", "Alta demanda regional e ticket médio elevado com ótima comissão.", "Consumidores de chimarrão, tereré e bebidas térmicas.", "Tendência Sul-Americana", "Faixa de", "R$ 149", "★ 4.9 • Top UY • Alta durabilidade", "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=800&q=80", 0, 90, "https://www.google.com/search?q=termo+mate+acero+inoxidable+uruguay", "https://lista.mercadolivre.com.br/garrafa-termica-inox-mate", "https://www.amazon.com.br/s?k=garrafa+termica+inox+mate", "https://www.amazon.com.br/s?k=garrafa+termica+inox+mate", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Curso E-commerce & Dropshipping LATAM CO", "Método de Vendas Sem Estoque para América Latina", "América do Sul", "Colômbia 🇨🇴", "Cursos & IA", "acesso_imediato", "Treinamento colombiano focado em operação enxuta e fornecedores locais rápidos.", "Forte interesse de iniciantes buscando renda extra online sem estoque.", "Empreendedores iniciantes e lojistas virtuais.", "Google Trends CO", "Modalidade", "ACESSO COMPLETO", "★ 4.8 • Top CO • Sem estoque", "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80", 0, 88, "https://trends.google.com/trends/explore?geo=CO&q=curso%20ecommerce", "https://lista.mercadolivre.com.br/curso-ecommerce", "https://hotmart.com/pt-br/marketplace/produtos?q=ecommerce+sem+estoque", "https://hotmart.com", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Plantilla Finanzas & Inversiones CL", "Planilha Automatizada de Fluxo de Caixa e Metas", "América do Sul", "Chile 🇨🇱", "Templates & Planilhas", "ticket_baixo", "Modelo financeiro limpo criado no Chile com gráficos automáticos de receitas e despesas.", "Alta procura por organização financeira pessoal e de pequenos negócios.", "Autônomos, pequenos comerciantes e famílias.", "Google Trends CL", "A partir de", "R$ 39", "★ 4.8 • Top CL • Entrega imediata", "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80", 0, 90, "https://trends.google.com/trends/explore?geo=CL&q=plantilla%20finanzas", "https://lista.mercadolivre.com.br/planilha-fluxo-de-caixa", "https://hotmart.com/pt-br/marketplace/produtos?q=planilha+fluxo+de+caixa", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M"))
         ]
         c.executemany('''
             INSERT OR IGNORE INTO opportunities (
-                term_origin, term_br, continent, region, format_type, description,
-                why_trending, target_audience, source_name, price_badge, image_url, is_featured,
-                gap_score, trend_source_url, br_market_url, supplier_url, affiliate_url, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                term_origin, term_br, continent, region, format_type, offer_tag, description,
+                why_trending, target_audience, source_name, price_prefix, price_value, social_proof,
+                image_url, is_featured, gap_score, trend_source_url, br_market_url, supplier_url, affiliate_url, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', seed_items)
         conn.commit()
     conn.close()
@@ -215,10 +227,13 @@ def fetch_reddit_opportunities():
 
 def save_opportunity(c, conn, term_origin, term_br, continent, region_label, source_name, geo_code="US"):
     fmt = classify_format(term_br)
+    offer_tag = "acesso_imediato" if fmt in ("Cursos & IA", "Templates & Planilhas") else "ticket_baixo"
+    price_prefix = "Modalidade" if fmt == "Cursos & IA" else "Faixa de"
+    price_value = "ACESSO IMEDIATO" if fmt == "Cursos & IA" else "R$ 79"
+    social_proof = "★ 4.8 • Captado Ao Vivo • Radar 24h"
     desc = f"Oportunidade internacional captada via {source_name} ({region_label}) antes da saturação no Brasil." if geo_code != "BR" else f"Tendência em alta captada via {source_name}."
-    why = f"Sinal validado em {region_label} pela fonte {source_name} com alto potencial de adaptação ao mercado brasileiro."
+    why = f"Sinal validado em {region_label} pela fonte {source_name} com alto potencial de conversão."
     audience = "Empreendedores digitais, profissionais buscando produtividade ou consumidores de novidades."
-    price_badge = "Captado Ao Vivo • Radar 24h"
     img_url = DEFAULT_IMAGES.get(fmt)
     trend_url = f"https://trends.google.com/trends/explore?geo={geo_code}&q={requests.utils.quote(term_origin)}"
     br_url = f"https://lista.mercadolivre.com.br/{requests.utils.quote(term_br)}"
@@ -228,11 +243,11 @@ def save_opportunity(c, conn, term_origin, term_br, continent, region_label, sou
     try:
         c.execute('''
             INSERT INTO opportunities (
-                term_origin, term_br, continent, region, format_type, description,
-                why_trending, target_audience, source_name, price_badge, image_url, is_featured,
-                gap_score, trend_source_url, br_market_url, supplier_url, affiliate_url, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (term_origin, term_br, continent, region_label, fmt, desc, why, audience, source_name, price_badge, img_url, 0, gap_score, trend_url, br_url, supp_url, br_url, datetime.now().strftime("%d/%m/%Y %H:%M")))
+                term_origin, term_br, continent, region, format_type, offer_tag, description,
+                why_trending, target_audience, source_name, price_prefix, price_value, social_proof,
+                image_url, is_featured, gap_score, trend_source_url, br_market_url, supplier_url, affiliate_url, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (term_origin, term_br, continent, region_label, fmt, offer_tag, desc, why, audience, source_name, price_prefix, price_value, social_proof, img_url, 0, gap_score, trend_url, br_url, supp_url, br_url, datetime.now().strftime("%d/%m/%Y %H:%M")))
         conn.commit()
     except sqlite3.IntegrityError:
         pass
@@ -242,7 +257,6 @@ def run_radar_cycle(nicho="geral"):
     c = conn.cursor()
     translator = GoogleTranslator(source='auto', target='pt')
 
-    # 1. RADAR BRASIL
     br_prefixes = ["melhor curso de ", "ferramenta de ia para ", "planilha de ", "melhor produto para "]
     for term in fetch_google_trends_rss("BR") + fetch_native_autocomplete("br", "pt-BR", br_prefixes):
         if is_commercial_opportunity(term, nicho):
@@ -252,7 +266,6 @@ def run_radar_cycle(nicho="geral"):
         conn.close()
         return
 
-    # 2. RADAR INTERNACIONAL MULTI-PAÍS
     intl_configs = [
         ("US", "us", "en", "Estados Unidos", "Estados Unidos 🇺🇸", ["best ai tool for ", "best notion template for ", "ai course for "]),
         ("GB", "gb", "en-GB", "Europa", "Europa (Reino Unido) 🇬🇧", ["best ai workflow ", "best productivity template ", "viral gadget "]),
@@ -275,7 +288,6 @@ def run_radar_cycle(nicho="geral"):
             except Exception:
                 continue
 
-    # 3. PRODUCT HUNT & REDDIT (EUA / EUROPA)
     if nicho in ("geral", "ia"):
         for ph_item in fetch_product_hunt_us():
             try:
@@ -316,7 +328,7 @@ LOGO_SVG = """
 </svg>
 """
 
-# --- 1. VITRINE PÚBLICA ---
+# --- 1. VITRINE PÚBLICA COM VALORES EM AMARELO-OURO DE ALTA DETECÇÃO VISUAL ---
 PUBLIC_HTML = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -348,7 +360,7 @@ PUBLIC_HTML = f"""
             Descubra os produtos e cursos mais vendidos no <strong>Brasil</strong> e acesse ferramentas validadas da <strong>América do Sul</strong>, <strong>Estados Unidos</strong> e <strong>Europa</strong>.
         </p>
 
-        <div id="vitrine" class="mt-8 max-w-3xl mx-auto space-y-4">
+        <div id="vitrine" class="mt-8 max-w-3xl mx-auto space-y-3.5">
             <input type="text" id="searchInput" onkeyup="filterCards()" placeholder="🔍 Buscar produto mais vendido, curso de IA, planilha ou termo..." class="w-full bg-white border border-slate-300 rounded-2xl px-5 py-3.5 text-sm shadow-sm focus:outline-none focus:border-emerald-500">
 
             <div class="flex flex-wrap justify-center gap-2 text-xs font-bold">
@@ -365,33 +377,53 @@ PUBLIC_HTML = f"""
                 <button onclick="setCategory('Cursos & IA', this)" class="cat-btn bg-white text-slate-600 border border-slate-200 hover:border-slate-400 px-3.5 py-1.5 rounded-full transition">Cursos & IA</button>
                 <button onclick="setCategory('Templates & Planilhas', this)" class="cat-btn bg-white text-slate-600 border border-slate-200 hover:border-slate-400 px-3.5 py-1.5 rounded-full transition">Templates & Planilhas</button>
             </div>
+
+            <div class="flex flex-wrap justify-center gap-1.5 text-[11px] font-bold pt-1">
+                <button onclick="setOffer('ALL', this)" class="offer-btn bg-amber-400 text-slate-950 border border-amber-500 px-3 py-1 rounded-full transition">Todas as Ofertas</button>
+                <button onclick="setOffer('ticket_baixo', this)" class="offer-btn bg-white text-slate-600 border border-slate-200 hover:border-amber-400 px-3 py-1 rounded-full transition">💸 Até R$ 100</button>
+                <button onclick="setOffer('recorrencia', this)" class="offer-btn bg-white text-slate-600 border border-slate-200 hover:border-amber-400 px-3 py-1 rounded-full transition">🔄 Uso Diário & Recompra</button>
+                <button onclick="setOffer('acesso_imediato', this)" class="offer-btn bg-white text-slate-600 border border-slate-200 hover:border-amber-400 px-3 py-1 rounded-full transition">⚡ Acesso Digital Imediato</button>
+                <button onclick="setOffer('faixa_media', this)" class="offer-btn bg-white text-slate-600 border border-slate-200 hover:border-amber-400 px-3 py-1 rounded-full transition">💎 R$ 100 – R$ 250</button>
+            </div>
         </div>
     </header>
 
+    <!-- TOP 3 ACHADOS DA SEMANA (SEM DUPLICAR NO CATÁLOGO ABAIXO) -->
     <section id="destaques" class="max-w-5xl mx-auto px-4 mb-10">
         <div class="text-center mb-5">
-            <span class="bg-amber-100 text-amber-900 text-[11px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full">🔥 Top 3 Achados da Semana</span>
-            <p class="text-xs text-slate-500 mt-1.5">Itens com maior demanda e melhor custo-benefício validados nesta semana</p>
+            <span class="bg-amber-300 text-slate-950 text-[11px] font-black uppercase tracking-wider px-3.5 py-1 rounded-full shadow-sm">🔥 Top 3 Achados da Semana</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             {{% for item in featured_items %}}
-            <div class="bg-white border-2 border-emerald-400/80 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition flex flex-col justify-between text-center">
+            <div class="bg-white border-2 border-amber-400 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition flex flex-col justify-between text-center">
                 <div>
                     <div class="relative h-40 w-full bg-slate-200 overflow-hidden">
-                        <img src="{{{{ item[11] }}}}" alt="{{{{ item[2] }}}}" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80'" class="w-full h-full object-cover">
-                        <span class="absolute top-2.5 left-2.5 bg-amber-400 text-slate-950 text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow">🔥 Destaque</span>
+                        <img src="{{{{ item[14] }}}}" alt="{{{{ item[2] }}}}" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80'" class="w-full h-full object-cover">
+                        <span class="absolute top-2.5 left-2.5 bg-amber-400 text-slate-950 text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow">🔥 Top 3</span>
                         <span class="absolute top-2.5 right-2.5 bg-slate-900/85 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">{{{{ item[4] }}}}</span>
                     </div>
                     <div class="p-5">
                         <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full">{{{{ item[5] }}}}</span>
                         <h3 class="text-lg font-extrabold text-[#0A2540] leading-snug mt-2">{{{{ item[2] }}}}</h3>
-                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">{{{{ item[6] }}}}</p>
-                        <p class="text-xs font-extrabold text-slate-800 bg-slate-100 rounded-lg py-1.5 px-3 mt-3">{{{{ item[10] }}}}</p>
+                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">{{{{ item[7] }}}}</p>
+
+                        <!-- FAIXA DE PREÇO AMARELO-OURO DE ALTA DETECÇÃO VISUAL -->
+                        <div class="mt-3.5 bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-300 border-2 border-amber-400 rounded-xl py-2.5 px-3 shadow-sm">
+                            {{% if 'R$' in item[12] %}}
+                            <div class="flex items-baseline justify-center gap-1.5">
+                                <span class="text-[10px] font-black uppercase tracking-wider text-slate-900">{{{{ item[11] }}}}</span>
+                                <span class="text-2xl font-black text-slate-950 tracking-tight">{{{{ item[12] }}}}</span>
+                            </div>
+                            {{% else %}}
+                            <span class="inline-block bg-[#0A2540] text-amber-300 text-xs font-black tracking-wide px-3 py-1 rounded-lg uppercase">⚡ {{{{ item[12] }}}}</span>
+                            {{% endif %}}
+                            <p class="text-[10px] font-bold text-slate-900 mt-1">{{{{ item[13] }}}}</p>
+                        </div>
                     </div>
                 </div>
                 <div class="px-5 pb-5">
-                    <a href="{{{{ item[17] }}}}" target="_blank" class="block w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-sm">
-                        {{{{ 'Ver Conteúdo e Acesso →' if item[5] == 'Cursos & IA' else ('Ver Modelo e Recursos →' if item[5] == 'Templates & Planilhas' else 'Conferir Oferta e Detalhes →') }}}}
+                    <a href="{{{{ item[20] }}}}" target="_blank" class="block w-full bg-[#0A2540] hover:bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm transition shadow-sm">
+                        {{{{ 'Acessar Treinamento / Ferramenta →' if item[5] == 'Cursos & IA' else ('Baixar Modelo Pronto →' if item[5] == 'Templates & Planilhas' else 'Conferir Menor Preço →') }}}}
                     </a>
                 </div>
             </div>
@@ -399,6 +431,7 @@ PUBLIC_HTML = f"""
         </div>
     </section>
 
+    <!-- CATÁLOGO COMPLETO (SEM REPETIR O TOP 3) -->
     <main class="max-w-5xl mx-auto px-4 pb-16">
         <div class="text-center mb-6">
             <h2 class="text-sm font-extrabold uppercase tracking-wider text-slate-500">Catálogo Completo Monitorado ({{{{ items|length }}}} Oportunidades)</h2>
@@ -408,343 +441,32 @@ PUBLIC_HTML = f"""
             <div class="opp-card bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between text-center"
                  data-cont="{{{{ item[3] }}}}"
                  data-cat="{{{{ item[5] }}}}"
-                 data-text="{{{{ item[2]|lower }}}} {{{{ item[1]|lower }}}} {{{{ item[6]|lower }}}} {{{{ item[4]|lower }}}}">
+                 data-offer="{{{{ item[6] }}}}"
+                 data-text="{{{{ item[2]|lower }}}} {{{{ item[1]|lower }}}} {{{{ item[7]|lower }}}} {{{{ item[4]|lower }}}}">
                 <div>
                     <div class="relative h-36 w-full bg-slate-100 overflow-hidden">
-                        <img src="{{{{ item[11] }}}}" alt="{{{{ item[2] }}}}" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80'" class="w-full h-full object-cover">
+                        <img src="{{{{ item[14] }}}}" alt="{{{{ item[2] }}}}" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80'" class="w-full h-full object-cover">
                         <span class="absolute top-2.5 left-2.5 bg-white/95 text-slate-800 text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">{{{{ item[4] }}}}</span>
                         <span class="absolute top-2.5 right-2.5 bg-sky-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">{{{{ item[5] }}}}</span>
                     </div>
                     <div class="p-5">
                         <h3 class="text-base font-extrabold text-[#0A2540] leading-snug">{{{{ item[2] }}}}</h3>
-                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">{{{{ item[6] }}}}</p>
-                        <p class="text-[11px] font-bold text-slate-700 bg-slate-100 rounded-lg py-1 px-2.5 mt-3">{{{{ item[10] }}}}</p>
+                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">{{{{ item[7] }}}}</p>
+
+                        <!-- FAIXA DE PREÇO AMARELO-OURO DE ALTA DETECÇÃO VISUAL -->
+                        <div class="mt-3.5 bg-gradient-to-r from-amber-200 via-yellow-200 to-amber-200 border border-amber-400 rounded-xl py-2 px-3 shadow-sm">
+                            {{% if 'R$' in item[12] %}}
+                            <div class="flex items-baseline justify-center gap-1.5">
+                                <span class="text-[10px] font-black uppercase tracking-wider text-slate-800">{{{{ item[11] }}}}</span>
+                                <span class="text-2xl font-black text-slate-950 tracking-tight">{{{{ item[12] }}}}</span>
+                            </div>
+                            {{% else %}}
+                            <span class="inline-block bg-[#0A2540] text-amber-300 text-[11px] font-black tracking-wide px-2.5 py-1 rounded-lg uppercase">⚡ {{{{ item[12] }}}}</span>
+                            {{% endif %}}
+                            <p class="text-[10px] font-bold text-slate-800 mt-1">{{{{ item[13] }}}}</p>
+                        </div>
                     </div>
                 </div>
                 <div class="px-5 pb-5">
-                    <a href="{{{{ item[17] }}}}" target="_blank" class="block w-full bg-[#0A2540] hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">
-                        {{{{ 'Ver Conteúdo e Acesso →' if item[5] == 'Cursos & IA' else ('Ver Modelo e Recursos →' if item[5] == 'Templates & Planilhas' else 'Conferir Oferta e Detalhes →') }}}}
-                    </a>
-                </div>
-            </div>
-            {{% endfor %}}
-        </div>
-
-        <div class="mt-14 bg-[#0A2540] text-white rounded-3xl p-8 text-center shadow-lg max-w-3xl mx-auto">
-            <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">Radar VIP Gratuito</span>
-            <h3 class="text-2xl font-black mt-3">Receba os 5 Achados Mais Fortes da Semana</h3>
-            <p class="text-xs md:text-sm text-slate-300 mt-2 max-w-xl mx-auto">
-                Seleção semanal filtrada com as melhores ofertas do Brasil e ferramentas validadas dos EUA e Europa direto no seu celular.
-            </p>
-            <a href="{VIP_CHANNEL_URL}" target="_blank" class="inline-block mt-5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold px-6 py-3 rounded-xl text-sm transition shadow">
-                Entrar no Canal VIP Gratuito →
-            </a>
-            <p class="text-[11px] text-slate-400 mt-2.5">Sem spam • Curadoria semanal gratuita</p>
-        </div>
-    </main>
-
-    <footer class="border-t border-slate-200 py-8 text-center text-xs text-slate-500">
-        <p class="font-bold text-[#0A2540]">FARO GLOBAL • faroglobal.com.br</p>
-        <p class="mt-1">Monitoramento Brasil, América do Sul, EUA & Europa 24/7</p>
-    </footer>
-
-    <script>
-        let currentCont = 'ALL';
-        let currentCat = 'ALL';
-        function setContinent(cont, btn) {{
-            currentCont = cont;
-            document.querySelectorAll('.cont-btn').forEach(b => b.className = 'cont-btn bg-white text-slate-600 border border-slate-200 hover:border-slate-400 px-4 py-2 rounded-full transition');
-            btn.className = cont === 'Brasil' ? 'cont-btn bg-emerald-600 text-white px-4 py-2 rounded-full transition shadow-sm' : 'cont-btn bg-[#0A2540] text-white px-4 py-2 rounded-full transition shadow-sm';
-            filterCards();
-        }}
-        function setCategory(cat, btn) {{
-            currentCat = cat;
-            document.querySelectorAll('.cat-btn').forEach(b => b.className = 'cat-btn bg-white text-slate-600 border border-slate-200 hover:border-slate-400 px-3.5 py-1.5 rounded-full transition');
-            btn.className = 'cat-btn bg-slate-800 text-white px-3.5 py-1.5 rounded-full transition';
-            filterCards();
-        }}
-        function filterCards() {{
-            const q = document.getElementById('searchInput').value.toLowerCase();
-            document.querySelectorAll('.opp-card').forEach(card => {{
-                const matchCont = currentCont === 'ALL' || card.dataset.cont === currentCont;
-                const matchCat = currentCat === 'ALL' || card.dataset.cat === currentCat;
-                const matchText = card.dataset.text.includes(q);
-                card.style.display = (matchCont && matchCat && matchText) ? 'flex' : 'none';
-            }});
-        }}
-    </script>
-</body>
-</html>
-"""
-
-# --- 2. LOGIN ADMINISTRATIVO ---
-LOGIN_HTML = f"""
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acesso Restrito • Faro Global</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-50 text-slate-900 flex items-center justify-center min-h-screen px-4">
-    <form method="POST" class="bg-white border border-slate-200 p-8 rounded-2xl w-full max-w-sm shadow-xl text-center">
-        {LOGO_SVG}
-        <h1 class="text-xl font-black text-[#0A2540] mt-3">FARO <span class="text-emerald-500">GLOBAL</span></h1>
-        <p class="text-xs text-slate-500 mb-6">Painel Administrativo Protegido</p>
-        {{% if error %}}<div class="bg-red-50 border border-red-200 text-red-700 text-xs p-3 rounded-xl mb-4">{{{{ error }}}}</div>{{% endif %}}
-        <input type="password" name="password" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-center mb-4 focus:outline-none focus:border-emerald-500" placeholder="Digite sua senha mestra">
-        <button type="submit" class="w-full bg-[#0A2540] hover:bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm transition">Desbloquear Painel</button>
-        <a href="/" class="block text-xs text-slate-400 hover:text-slate-700 mt-4">← Voltar para a Vitrine</a>
-    </form>
-</body>
-</html>
-"""
-
-# --- 3. PAINEL ADMINISTRATIVO EXCLUSIVO ---
-ADMIN_HTML = """
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin • Radar 24h & Dossiês • Faro Global</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-50 text-slate-900 font-sans p-4 md:p-8">
-    <div class="max-w-6xl mx-auto">
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 text-center shadow-sm">
-            <h1 class="text-2xl font-black text-[#0A2540]">📡 Central de Inteligência & Auditoria • <span class="text-emerald-500">Faro Global</span></h1>
-            <p class="text-xs text-slate-500 mt-1">Radar Nacional Brasil + Motor Internacional 4 Fontes (EUA, Europa & América do Sul)</p>
-            <div class="flex flex-wrap justify-center gap-3 mt-5">
-                <a href="/admin/run-now" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition shadow-sm">⚡ Rodar Varredura Global & Brasil Agora</a>
-                <a href="/" target="_blank" class="bg-[#0A2540] hover:bg-slate-800 text-white font-semibold px-5 py-2.5 rounded-xl text-xs transition">Abrir Vitrine Pública</a>
-                <a href="/admin/logout" class="bg-red-50 text-red-600 border border-red-200 font-semibold px-4 py-2.5 rounded-xl text-xs">Bloquear Painel</a>
-            </div>
-        </div>
-
-        <div class="bg-gradient-to-br from-[#0A2540] to-slate-900 text-white rounded-2xl p-6 mb-8 shadow-lg">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-3 mb-4 border-b border-white/10 pb-4">
-                <div>
-                    <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full">Exclusivo Administrador • Radar Ao Vivo</span>
-                    <h2 class="text-lg font-black mt-1">🇧🇷 Radar Nacional Brasil — Últimas Capturas</h2>
-                </div>
-                <div class="flex flex-wrap gap-2 text-[11px] font-bold">
-                    <a href="https://trends.google.com/trending?geo=BR" target="_blank" class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg">1. Google Trends BR ↗</a>
-                    <a href="https://www.producthunt.com" target="_blank" class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg">2. Product Hunt US ↗</a>
-                    <a href="https://www.reddit.com/r/SideProject/top/" target="_blank" class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg">3. Reddit Trending ↗</a>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {% for br in br_items[:6] %}
-                <div class="bg-white/10 border border-white/10 rounded-xl p-3.5 text-left">
-                    <div class="flex justify-between items-center text-[10px] font-bold text-emerald-300">
-                        <span>{{ br[9] }}</span>
-                        <span>Score {{ br[13] }}/100</span>
-                    </div>
-                    <p class="font-bold text-sm text-white mt-1">{{ br[2] }}</p>
-                    <p class="text-[11px] text-slate-300 mt-1">{{ br[10] }}</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-8 shadow-sm">
-            <h2 class="text-sm font-extrabold text-[#0A2540] uppercase tracking-wider mb-4 text-center">+ Cadastrar Novo Produto / Curso na Vitrine</h2>
-            <form method="POST" action="/admin/add-item" class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <input type="text" name="term_br" required placeholder="Título na Vitrine" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs">
-                <input type="text" name="term_origin" required placeholder="Termo Original de Busca" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs">
-                <select name="region_combo" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold">
-                    <option value="Brasil|Brasil 🇧🇷">🇧🇷 Brasil (Mais Vendidos)</option>
-                    <option value="América do Sul|Argentina 🇦🇷">🇦🇷 América do Sul (Argentina)</option>
-                    <option value="América do Sul|Chile 🇨🇱">🇨🇱 América do Sul (Chile)</option>
-                    <option value="América do Sul|Colômbia 🇨🇴">🇨🇴 América do Sul (Colômbia)</option>
-                    <option value="América do Sul|Uruguai 🇺🇾">🇺🇾 América do Sul (Uruguai)</option>
-                    <option value="Estados Unidos|Estados Unidos 🇺🇸">🇺🇸 Estados Unidos</option>
-                    <option value="Europa|Europa (Reino Unido) 🇬🇧">🇬🇧 Europa (Reino Unido)</option>
-                    <option value="Europa|Europa (Alemanha) 🇩🇪">🇩🇪 Europa (Alemanha)</option>
-                </select>
-                <select name="format_type" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold">
-                    <option value="Produtos Validados">Produtos Validados</option>
-                    <option value="Cursos & IA">Cursos & IA</option>
-                    <option value="Templates & Planilhas">Templates & Planilhas</option>
-                </select>
-                <input type="text" name="price_badge" required placeholder="Selo de Preço/Prova (ex: A partir de R$ 59 • ★ 4.9)" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs">
-                <input type="url" name="image_url" placeholder="URL da Imagem / Capa (Opcional)" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs">
-                <input type="text" name="why_trending" required placeholder="Por que está em alta?" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs">
-                <input type="text" name="target_audience" required placeholder="Público-alvo comprador" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs">
-                <input type="url" name="supplier_url" required placeholder="Link Fornecedor / Plataforma" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs">
-                <input type="url" name="affiliate_url" required placeholder="Seu Link Final de Venda / Afiliado" class="md:col-span-2 bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs">
-                <input type="text" name="description" required placeholder="Resumo comercial exibido no card público" class="bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs">
-                <button type="submit" class="md:col-span-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl text-xs transition">Publicar Produto & Trilha na Vitrine</button>
-            </form>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {% for item in items %}
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-xs font-bold text-sky-700 bg-sky-50 px-2.5 py-1 rounded-full">{{ item[4] }} • {{ item[5] }}</span>
-                        <div class="flex items-center gap-2">
-                            <a href="/admin/toggle-featured/{{ item[0] }}" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full {{ 'bg-amber-400 text-slate-950' if item[12] == 1 else 'bg-slate-100 text-slate-600' }}">
-                                {{ '🔥 No Top 3' if item[12] == 1 else '☆ Destacar' }}
-                            </a>
-                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-extrabold px-2.5 py-0.5 rounded-full">Score: {{ item[13] }}/100</span>
-                            <a href="/admin/delete/{{ item[0] }}" onclick="return confirm('Remover item?')" class="text-xs text-red-500 font-bold px-1.5">✕</a>
-                        </div>
-                    </div>
-
-                    <h3 class="text-lg font-extrabold text-[#0A2540] mt-2">{{ item[2] }}</h3>
-                    <p class="text-[11px] text-slate-400 mt-0.5">Fonte: <strong class="text-slate-600">{{ item[9] }}</strong> • {{ item[10] }}</p>
-
-                    <div class="mt-4 bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 space-y-2 text-xs">
-                        <p class="text-slate-700"><strong class="text-[#0A2540]">📌 Resumo:</strong> {{ item[6] }}</p>
-                        <p class="text-slate-700"><strong class="text-emerald-700">📈 Por que está em alta:</strong> {{ item[7] }}</p>
-                        <p class="text-slate-700"><strong class="text-sky-700">🎯 Público comprador:</strong> {{ item[8] }}</p>
-                    </div>
-
-                    <div class="mt-4">
-                        <p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-2">🧭 Trilha Direta até a Informação:</p>
-                        <div class="grid grid-cols-3 gap-2 text-[11px] font-bold">
-                            <a href="{{ item[14] }}" target="_blank" class="bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 py-2 px-2 rounded-lg text-center transition">1. Fonte Trends ↗</a>
-                            <a href="{{ item[15] }}" target="_blank" class="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 py-2 px-2 rounded-lg text-center transition">2. Mercado BR ↗</a>
-                            <a href="{{ item[16] }}" target="_blank" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 py-2 px-2 rounded-lg text-center transition">3. Fornecedor ↗</a>
-                        </div>
-                    </div>
-                </div>
-
-                <form method="POST" action="/admin/update-link/{{ item[0] }}" class="mt-4 pt-3 border-t border-slate-100 flex gap-2">
-                    <input type="url" name="affiliate_url" value="{{ item[17] }}" required class="flex-1 bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs">
-                    <button type="submit" class="bg-[#0A2540] hover:bg-emerald-600 text-white font-bold px-3.5 py-2 rounded-lg text-xs transition">Salvar Link</button>
-                </form>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</body>
-</html>
-"""
-
-# --- 4. ROTAS DA APLICAÇÃO ---
-@app.route("/")
-def index():
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("SELECT * FROM opportunities WHERE is_featured = 1 ORDER BY gap_score DESC LIMIT 3")
-    featured_items = c.fetchall()
-    c.execute("SELECT * FROM opportunities ORDER BY is_featured DESC, gap_score DESC, id DESC")
-    items = c.fetchall()
-    conn.close()
-    return render_template_string(PUBLIC_HTML, featured_items=featured_items, items=items)
-
-@app.route("/admin/login", methods=["GET", "POST"])
-def admin_login():
-    ip = request.headers.get("X-Forwarded-For", request.remote_addr)
-    if is_ip_blocked(ip):
-        return render_template_string(LOGIN_HTML, error="Muitas tentativas inválidas. Aguarde 30 minutos.")
-    if request.method == "POST":
-        pwd = request.form.get("password", "")
-        if pwd == ADMIN_PASSWORD:
-            session["admin_logged_in"] = True
-            return redirect(url_for("admin_panel"))
-        register_failed_login(ip)
-        return render_template_string(LOGIN_HTML, error="Senha incorreta.")
-    return render_template_string(LOGIN_HTML, error=None)
-
-@app.route("/admin/logout")
-def admin_logout():
-    session.pop("admin_logged_in", None)
-    return redirect(url_for("index"))
-
-@app.route("/admin")
-@login_required
-def admin_panel():
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("SELECT * FROM opportunities WHERE continent = 'Brasil' ORDER BY id DESC")
-    br_items = c.fetchall()
-    c.execute("SELECT * FROM opportunities ORDER BY is_featured DESC, gap_score DESC, id DESC")
-    items = c.fetchall()
-    conn.close()
-    return render_template_string(ADMIN_HTML, items=items, br_items=br_items)
-
-@app.route("/admin/add-item", methods=["POST"])
-@login_required
-def admin_add_item():
-    term_br = request.form.get("term_br", "").strip()
-    term_origin = request.form.get("term_origin", "").strip()
-    region_combo = request.form.get("region_combo", "Brasil|Brasil 🇧🇷")
-    continent, region_label = region_combo.split("|", 1)
-    format_type = request.form.get("format_type", "Produtos Validados")
-    price_badge = request.form.get("price_badge", "").strip()
-    image_url = request.form.get("image_url", "").strip() or DEFAULT_IMAGES.get(format_type)
-    why_trending = request.form.get("why_trending", "").strip()
-    target_audience = request.form.get("target_audience", "").strip()
-    supplier_url = request.form.get("supplier_url", "").strip()
-    affiliate_url = request.form.get("affiliate_url", "").strip()
-    description = request.form.get("description", "").strip()
-    trend_url = f"https://trends.google.com/trends/explore?q={requests.utils.quote(term_origin)}"
-    br_url = f"https://lista.mercadolivre.com.br/{requests.utils.quote(term_br)}"
-
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('''
-        INSERT OR REPLACE INTO opportunities (
-            term_origin, term_br, continent, region, format_type, description,
-            why_trending, target_audience, source_name, price_badge, image_url, is_featured,
-            gap_score, trend_source_url, br_market_url, supplier_url, affiliate_url, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (term_origin, term_br, continent, region_label, format_type, description, why_trending, target_audience, "Curadoria Manual Admin", price_badge, image_url, 0, 95, trend_url, br_url, supplier_url, affiliate_url, datetime.now().strftime("%d/%m/%Y %H:%M")))
-    conn.commit()
-    conn.close()
-    return redirect(url_for("admin_panel"))
-
-@app.route("/admin/update-link/<int:item_id>", methods=["POST"])
-@login_required
-def admin_update_link(item_id):
-    new_url = request.form.get("affiliate_url", "").strip()
-    if new_url:
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute("UPDATE opportunities SET affiliate_url = ? WHERE id = ?", (new_url, item_id))
-        conn.commit()
-        conn.close()
-    return redirect(url_for("admin_panel"))
-
-@app.route("/admin/toggle-featured/<int:item_id>")
-@login_required
-def admin_toggle_featured(item_id):
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("UPDATE opportunities SET is_featured = CASE WHEN is_featured = 1 THEN 0 ELSE 1 END WHERE id = ?", (item_id,))
-    conn.commit()
-    conn.close()
-    return redirect(url_for("admin_panel"))
-
-@app.route("/admin/delete/<int:item_id>")
-@login_required
-def admin_delete(item_id):
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("DELETE FROM opportunities WHERE id = ?", (item_id,))
-    conn.commit()
-    conn.close()
-    return redirect(url_for("admin_panel"))
-
-@app.route("/admin/run-now")
-@login_required
-def admin_run_now():
-    threading.Thread(target=run_radar_cycle, args=("geral",), daemon=True).start()
-    return redirect(url_for("admin_panel"))
-
-@app.route("/cron/radar")
-def cron_radar():
-    key = request.args.get("key", "")
-    nicho = request.args.get("nicho", "geral")
-    if key != CRON_SECRET_KEY:
-        return jsonify({"status": "unauthorized"}), 403
-    threading.Thread(target=run_radar_cycle, args=(nicho,), daemon=True).start()
-    return jsonify({"status": "started", "nicho": nicho})
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+                    <a href="{{{{ item[20] }}}}" target="_blank" class="block w-full bg-[#0A2540] hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">
+                        {{{{ 'Acessar Treinamento / Ferramenta →' if item[5] == 'Cursos & IA' else ('Baixar Modelo Pronto →' if item[5] == 'Templates & Planilhas' else 'Conferir Menor
