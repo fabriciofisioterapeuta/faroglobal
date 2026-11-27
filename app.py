@@ -81,26 +81,26 @@ def init_db():
     if c.fetchone()[0] == 0:
         seed_items = [
             # BRASIL
-            ("Creatina Monohidratada Pura 300g", "Creatina Monohidratada Pura (Campeã de Buscas)", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Suplemento nº 1 em pedidos recorrentes e buscas diárias nos marketplaces brasileiros.", "Alta taxa de recompra mensal (ciclo de 30 dias) e forte procura orgânica.", "Praticantes de musculação, corredores e público fitness.", "Google Trends BR + Autocomplete", "A partir de R$ 59 • ★ 4.9 (10k+ vendidos)", "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?auto=format&fit=crop&w=800&q=80", 1, 97, "https://trends.google.com.br/trends/explore?geo=BR&q=Creatina%20Monohidratada", "https://lista.mercadolivre.com.br/creatina-monohidratada-pura", "https://www.amazon.com.br/s?k=creatina+monohidratada+pura", "https://www.amazon.com.br/s?k=creatina+monohidratada+pura", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Mini Projetor Portátil 4K Wi-Fi", "Mini Projetor Smart Portátil Full HD / 4K com Wi-Fi", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Fenômeno viral nas redes sociais e campeão de vendas para cinema em casa e apresentações.", "Alta viralização em vídeos curtos com excelente conversão no Brasil.", "Famílias, gamers, estudantes e profissionais externos.", "Radar Ofertas Quentes BR", "Faixa de R$ 229 • ★ 4.8 (Viral BR)", "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=800&q=80", 1, 94, "https://trends.google.com.br/trends/explore?geo=BR&q=Mini%20Projetor%20Portatil", "https://lista.mercadolivre.com.br/mini-projetor-portatil-wifi", "https://shopee.com.br/search?keyword=mini%20projetor%20portatil", "https://shopee.com.br/search?keyword=mini%20projetor%20portatil", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Air Fryer Digital & Acessórios", "Kit Formas de Silicone & Acessórios para Air Fryer", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Um dos itens mais pesquisados e vendidos na Shopee e Mercado Livre com altíssima conversão.", "Compra por impulso de ticket baixo com altíssimo volume diário.", "Donos de fritadeira elétrica e compradores de utilidades domésticas.", "Google Autocomplete BR", "A partir de R$ 29 • ★ 4.8 (+50k pedidos)", "https://images.unsplash.com/photo-1585515320310-259814833e62?auto=format&fit=crop&w=800&q=80", 0, 95, "https://trends.google.com.br/trends/explore?geo=BR&q=Forma%20Silicone%20Air%20Fryer", "https://lista.mercadolivre.com.br/forma-silicone-air-fryer", "https://shopee.com.br/search?keyword=forma%20silicone%20air%20fryer", "https://shopee.com.br/search?keyword=forma%20silicone%20air%20fryer", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Fone Bluetooth TWS ANC", "Fone de Ouvido Sem Fio TWS com Cancelamento de Ruído", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Líder absoluto em buscas de eletrônicos portáteis no Brasil com excelente custo-benefício.", "Alta procura diária para academia, corridas e reuniões online.", "Praticantes de esportes, estudantes e trabalhadores remotos.", "Google Trends BR + Ofertas", "Faixa de R$ 89 • ★ 4.8 (Top Áudio BR)", "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=800&q=80", 0, 93, "https://trends.google.com.br/trends/explore?geo=BR&q=Fone%20Bluetooth%20TWS", "https://lista.mercadolivre.com.br/fone-bluetooth-tws-anc", "https://www.amazon.com.br/s?k=fone+bluetooth+tws+anc", "https://www.amazon.com.br/s?k=fone+bluetooth+tws+anc", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Sérum Facial Vitamina C & Ácido Hialurônico", "Kit Skincare Sérum Vitamina C + Ácido Hialurônico", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Categoria de beleza com maior crescimento de buscas e recompra recorrente no Brasil.", "Forte engajamento orgânico e alta taxa de recompra a cada 45 dias.", "Público interessado em cuidados com a pele e estética facial.", "Google Autocomplete BR", "A partir de R$ 44 • ★ 4.9 (Top Beleza)", "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80", 0, 92, "https://trends.google.com.br/trends/explore?geo=BR&q=Serum%20Vitamina%20C", "https://lista.mercadolivre.com.br/serum-vitamina-c-acido-hialuronico", "https://www.amazon.com.br/s?k=serum+vitamina+c+acido+hialuronico", "https://www.amazon.com.br/s?k=serum+vitamina+c+acido+hialuronico", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Smartwatch Esportivo GPS", "Relógio Inteligente Esportivo com Monitor Cardíaco e GPS", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Alta procura entre praticantes de corrida de rua, academia e ciclismo em todo o país.", "Crescimento contínuo das assessorias de corrida e provas de rua no Brasil.", "Corredores de rua, ciclistas e entusiastas de saúde.", "Radar Ofertas Quentes BR", "Faixa de R$ 179 • ★ 4.8 (Fitness BR)", "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?auto=format&fit=crop&w=800&q=80", 0, 91, "https://trends.google.com.br/trends/explore?geo=BR&q=Smartwatch%20GPS%20Corrida", "https://lista.mercadolivre.com.br/smartwatch-esportivo-gps", "https://www.amazon.com.br/s?k=smartwatch+esportivo+gps", "https://www.amazon.com.br/s?k=smartwatch+esportivo+gps", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Curso Automação WhatsApp & IA BR", "Formação Prática de IA & Automação Comercial no WhatsApp", "Brasil", "Brasil 🇧🇷", "Cursos & IA", "Treinamento mais procurado por empresas e profissionais que querem automatizar atendimento.", "Demanda crescente por redução de custos operacionais com agentes de IA.", "Donos de negócios locais, clínicas, infoprodutores e gestores.", "Google Autocomplete BR", "Acesso Imediato • ★ 4.9 (Hotmart/Kiwify)", "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80", 0, 96, "https://trends.google.com.br/trends/explore?geo=BR&q=Automacao%20WhatsApp%20IA", "https://lista.mercadolivre.com.br/curso-automacao-whatsapp", "https://hotmart.com/pt-br/marketplace/produtos?q=automacao+whatsapp+ia", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Planilha Controle Financeiro 2026 BR", "Planilha Automática de Finanças Pessoais & Investimentos", "Brasil", "Brasil 🇧🇷", "Templates & Planilhas", "Dashboard pronto em Excel e Google Sheets para organizar orçamento e metas mensais.", "Produto digital de entrega imediata e altíssima conversão no início e fim de mês.", "Assalariados, autônomos, casais e investidores iniciantes.", "Google Autocomplete BR", "A partir de R$ 37 • Entrega Imediata", "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=800&q=80", 0, 91, "https://trends.google.com.br/trends/explore?geo=BR&q=Planilha%20Controle%20Financeiro", "https://lista.mercadolivre.com.br/planilha-controle-financeiro", "https://hotmart.com/pt-br/marketplace/produtos?q=planilha+controle+financeiro", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Creatina Monohidratada Pura 300g", "Creatina Monohidratada Pura (Campeã de Buscas)", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Suplemento nº 1 em pedidos recorrentes para ganho de força e recuperação muscular nos marketplaces.", "Alta taxa de recompra mensal (ciclo de 30 dias) e forte procura orgânica.", "Praticantes de musculação, corredores e público fitness.", "Google Trends BR + Autocomplete", "A partir de R$ 59 • ★ 4.9 (10k+ vendidos)", "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?auto=format&fit=crop&w=800&q=80", 1, 97, "https://trends.google.com.br/trends/explore?geo=BR&q=Creatina%20Monohidratada", "https://lista.mercadolivre.com.br/creatina-monohidratada-pura", "https://www.amazon.com.br/s?k=creatina+monohidratada+pura", "https://www.amazon.com.br/s?k=creatina+monohidratada+pura", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Mini Projetor Portátil 4K Wi-Fi", "Mini Projetor Smart Portátil Full HD / 4K com Wi-Fi", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Transforme qualquer parede em tela de cinema ou apresentação sem precisar de cabos ou computador.", "Alta viralização em vídeos curtos com excelente conversão no Brasil.", "Famílias, gamers, estudantes e profissionais externos.", "Radar Ofertas Quentes BR", "Faixa de R$ 229 • ★ 4.8 (Viral BR)", "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=800&q=80", 1, 94, "https://trends.google.com.br/trends/explore?geo=BR&q=Mini%20Projetor%20Portatil", "https://lista.mercadolivre.com.br/mini-projetor-portatil-wifi", "https://shopee.com.br/search?keyword=mini%20projetor%20portatil", "https://shopee.com.br/search?keyword=mini%20projetor%20portatil", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Air Fryer Digital & Acessórios", "Kit Formas de Silicone & Acessórios para Air Fryer", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Evite sujeira e preserve o antiaderente do cesto com formas reutilizáveis de fácil limpeza.", "Compra por impulso de ticket baixo com altíssimo volume diário.", "Donos de fritadeira elétrica e compradores de utilidades domésticas.", "Google Autocomplete BR", "A partir de R$ 29 • ★ 4.8 (+50k pedidos)", "https://images.unsplash.com/photo-1585515320310-259814833e62?auto=format&fit=crop&w=800&q=80", 0, 95, "https://trends.google.com.br/trends/explore?geo=BR&q=Forma%20Silicone%20Air%20Fryer", "https://lista.mercadolivre.com.br/forma-silicone-air-fryer", "https://shopee.com.br/search?keyword=forma%20silicone%20air%20fryer", "https://shopee.com.br/search?keyword=forma%20silicone%20air%20fryer", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Fone Bluetooth TWS ANC", "Fone de Ouvido Sem Fio TWS com Cancelamento de Ruído", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Isole barulhos externos em treinos, viagens ou reuniões com bateria de longa duração.", "Alta procura diária para academia, corridas e reuniões online.", "Praticantes de esportes, estudantes e trabalhadores remotos.", "Google Trends BR + Ofertas", "Faixa de R$ 89 • ★ 4.8 (Top Áudio BR)", "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=800&q=80", 0, 93, "https://trends.google.com.br/trends/explore?geo=BR&q=Fone%20Bluetooth%20TWS", "https://lista.mercadolivre.com.br/fone-bluetooth-tws-anc", "https://www.amazon.com.br/s?k=fone+bluetooth+tws+anc", "https://www.amazon.com.br/s?k=fone+bluetooth+tws+anc", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Sérum Facial Vitamina C & Ácido Hialurônico", "Kit Skincare Sérum Vitamina C + Ácido Hialurônico", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Rotina prática de hidratação profunda e uniformização da pele com alta recompra recorrente.", "Forte engajamento orgânico e alta taxa de recompra a cada 45 dias.", "Público interessado em cuidados com a pele e estética facial.", "Google Autocomplete BR", "A partir de R$ 44 • ★ 4.9 (Top Beleza)", "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80", 0, 92, "https://trends.google.com.br/trends/explore?geo=BR&q=Serum%20Vitamina%20C", "https://lista.mercadolivre.com.br/serum-vitamina-c-acido-hialuronico", "https://www.amazon.com.br/s?k=serum+vitamina+c+acido+hialuronico", "https://www.amazon.com.br/s?k=serum+vitamina+c+acido+hialuronico", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Smartwatch Esportivo GPS", "Relógio Inteligente Esportivo com Monitor Cardíaco e GPS", "Brasil", "Brasil 🇧🇷", "Produtos Validados", "Acompanhe ritmo, distância e batimentos sem depender do celular durante corridas e treinos.", "Crescimento contínuo das assessorias de corrida e provas de rua no Brasil.", "Corredores de rua, ciclistas e entusiastas de saúde.", "Radar Ofertas Quentes BR", "Faixa de R$ 179 • ★ 4.8 (Fitness BR)", "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?auto=format&fit=crop&w=800&q=80", 0, 91, "https://trends.google.com.br/trends/explore?geo=BR&q=Smartwatch%20GPS%20Corrida", "https://lista.mercadolivre.com.br/smartwatch-esportivo-gps", "https://www.amazon.com.br/s?k=smartwatch+esportivo+gps", "https://www.amazon.com.br/s?k=smartwatch+esportivo+gps", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Curso Automação WhatsApp & IA BR", "Formação Prática de IA & Automação Comercial no WhatsApp", "Brasil", "Brasil 🇧🇷", "Cursos & IA", "Atenda leads 24h, agende horários e qualifique clientes no WhatsApp sem aumentar equipe.", "Demanda crescente por redução de custos operacionais com agentes de IA.", "Donos de negócios locais, clínicas, infoprodutores e gestores.", "Google Autocomplete BR", "Acesso Imediato • ★ 4.9 (Hotmart/Kiwify)", "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80", 0, 96, "https://trends.google.com.br/trends/explore?geo=BR&q=Automacao%20WhatsApp%20IA", "https://lista.mercadolivre.com.br/curso-automacao-whatsapp", "https://hotmart.com/pt-br/marketplace/produtos?q=automacao+whatsapp+ia", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Planilha Controle Financeiro 2026 BR", "Planilha Automática de Finanças Pessoais & Investimentos", "Brasil", "Brasil 🇧🇷", "Templates & Planilhas", "Controle entradas, gastos fixos, metas e aportes em um painel automático pronto para usar.", "Produto digital de entrega imediata e altíssima conversão no início e fim de mês.", "Assalariados, autônomos, casais e investidores iniciantes.", "Google Autocomplete BR", "A partir de R$ 37 • Entrega Imediata", "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=800&q=80", 0, 91, "https://trends.google.com.br/trends/explore?geo=BR&q=Planilha%20Controle%20Financeiro", "https://lista.mercadolivre.com.br/planilha-controle-financeiro", "https://hotmart.com/pt-br/marketplace/produtos?q=planilha+controle+financeiro", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
 
             # ESTADOS UNIDOS
-            ("AI Workflow Automation Course", "Curso Completo de Automação com IA (Sem Código)", "Estados Unidos", "Estados Unidos 🇺🇸", "Cursos & IA", "Treinamento prático americano para automatizar atendimento e vendas usando agentes de IA.", "Explosão de buscas nos EUA por fluxos no n8n e Make com baixa oferta em português.", "Empreendedores digitais, gestores de tráfego e agências.", "Google Trends US", "Acesso Vitalício • ★ 4.9 (Validado EUA)", "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80", 1, 96, "https://trends.google.com/trends/explore?geo=US&q=AI%20Workflow%20Automation", "https://lista.mercadolivre.com.br/curso-automacao-ia", "https://hotmart.com/pt-br/marketplace/produtos?q=automacao+ia", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Prompt Engineering Masterclass", "Formação Engenharia de Prompts para Negócios", "Estados Unidos", "Estados Unidos 🇺🇸", "Cursos & IA", "Biblioteca de comandos prontos para extrair resultados profissionais de ChatGPT e Claude.", "Alta procura por profissionais buscando produtividade imediata.", "Redatores, advogados, médicos, professores e consultores.", "Google Trends US", "A partir de R$ 67 • ★ 4.8 (Top IA EUA)", "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=800&q=80", 0, 90, "https://trends.google.com/trends/explore?geo=US&q=Prompt%20Engineering", "https://lista.mercadolivre.com.br/curso-engenharia-de-prompts", "https://hotmart.com/pt-br/marketplace/produtos?q=engenharia+de+prompts", "https://hotmart.com", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("AI Workflow Automation Course", "Curso Completo de Automação com IA (Sem Código)", "Estados Unidos", "Estados Unidos 🇺🇸", "Cursos & IA", "Monte fluxos automáticos de atendimento e tarefas repetitivas em horas usando n8n e Make.", "Explosão de buscas nos EUA por fluxos no n8n e Make com baixa oferta em português.", "Empreendedores digitais, gestores de tráfego e agências.", "Google Trends US", "Acesso Vitalício • ★ 4.9 (Validado EUA)", "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80", 1, 96, "https://trends.google.com/trends/explore?geo=US&q=AI%20Workflow%20Automation", "https://lista.mercadolivre.com.br/curso-automacao-ia", "https://hotmart.com/pt-br/marketplace/produtos?q=automacao+ia", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Prompt Engineering Masterclass", "Formação Engenharia de Prompts para Negócios", "Estados Unidos", "Estados Unidos 🇺🇸", "Cursos & IA", "Acelere relatórios, textos e análises diárias com comandos prontos para ChatGPT e Claude.", "Alta procura por profissionais buscando produtividade imediata.", "Redatores, advogados, médicos, professores e consultores.", "Google Trends US", "A partir de R$ 67 • ★ 4.8 (Top IA EUA)", "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=800&q=80", 0, 90, "https://trends.google.com/trends/explore?geo=US&q=Prompt%20Engineering", "https://lista.mercadolivre.com.br/curso-engenharia-de-prompts", "https://hotmart.com/pt-br/marketplace/produtos?q=engenharia+de+prompts", "https://hotmart.com", datetime.now().strftime("%d/%m/%Y %H:%M")),
 
             # EUROPA
-            ("Notion Second Brain 2026 System", "Sistema Segundo Cérebro no Notion (Produtividade)", "Europa", "Europa (Reino Unido) 🇬🇧", "Templates & Planilhas", "Template completo de gestão de projetos, finanças e metas pessoais com alta demanda na Europa.", "Custo zero de estoque e entrega imediata via link duplicável do Notion.", "Estudantes universitários, freelancers e criadores de conteúdo.", "Google Trends UK", "A partir de R$ 47 • Entrega Imediata", "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=800&q=80", 0, 91, "https://trends.google.com/trends/explore?geo=GB&q=Notion%20Second%20Brain", "https://lista.mercadolivre.com.br/template-notion", "https://www.notion.so/templates/search?query=second+brain", "https://hotmart.com", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Portable Espresso Maker Travel", "Cafeteira Portátil de Pressão para Viagem e Escritório", "Europa", "Europa (Alemanha) 🇩🇪", "Produtos Validados", "Gadget compacto que prepara café expresso sem eletricidade, viral em lojas europeias.", "Vídeos de demonstração com alto engajamento na Alemanha e Itália.", "Viajantes frequentes, motoristas, campistas e amantes de café.", "Google Trends DE", "Faixa de R$ 189 • ★ 4.9 (Sucesso EU)", "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80", 0, 93, "https://trends.google.com/trends/explore?geo=DE&q=Portable%20Espresso%20Maker", "https://lista.mercadolivre.com.br/cafeteira-portatil-expresso", "https://pt.aliexpress.com/wholesale?SearchText=portable+espresso+maker", "https://www.amazon.com.br/s?k=cafeteira+portatil+expresso", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Notion Second Brain 2026 System", "Sistema Segundo Cérebro no Notion (Produtividade)", "Europa", "Europa (Reino Unido) 🇬🇧", "Templates & Planilhas", "Centralize projetos, tarefas, finanças e metas em um workspace duplicável com 1 clique.", "Custo zero de estoque e entrega imediata via link duplicável do Notion.", "Estudantes universitários, freelancers e criadores de conteúdo.", "Google Trends UK", "A partir de R$ 47 • Entrega Imediata", "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=800&q=80", 0, 91, "https://trends.google.com/trends/explore?geo=GB&q=Notion%20Second%20Brain", "https://lista.mercadolivre.com.br/template-notion", "https://www.notion.so/templates/search?query=second+brain", "https://hotmart.com", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Portable Espresso Maker Travel", "Cafeteira Portátil de Pressão para Viagem e Escritório", "Europa", "Europa (Alemanha) 🇩🇪", "Produtos Validados", "Extraia café expresso cremoso em qualquer lugar sem depender de tomada ou cápsulas caras.", "Vídeos de demonstração com alto engajamento na Alemanha e Itália.", "Viajantes frequentes, motoristas, campistas e amantes de café.", "Google Trends DE", "Faixa de R$ 189 • ★ 4.9 (Sucesso EU)", "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80", 0, 93, "https://trends.google.com/trends/explore?geo=DE&q=Portable%20Espresso%20Maker", "https://lista.mercadolivre.com.br/cafeteira-portatil-expresso", "https://pt.aliexpress.com/wholesale?SearchText=portable+espresso+maker", "https://www.amazon.com.br/s?k=cafeteira+portatil+expresso", datetime.now().strftime("%d/%m/%Y %H:%M")),
 
             # AMÉRICA DO SUL
-            ("Sistema Gestión Clínicas & Turnos AR", "Sistema Inteligente de Agendamento & Gestão de Clínicas", "América do Sul", "Argentina 🇦🇷", "Templates & Planilhas", "Plataforma/planilha argentina de controle de pacientes, agendas e faturamento recorrente.", "Forte adoção por clínicas pequenas e consultórios buscando reduzir faltas.", "Fisioterapeutas, dentistas, psicólogos e clínicas de estética.", "Google Trends AR", "A partir de R$ 67 • ★ 4.9 (LATAM)", "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80", 0, 92, "https://trends.google.com/trends/explore?geo=AR&q=gestion%20turnos%20clinicas", "https://lista.mercadolivre.com.br/planilha-gestao-clinica", "https://hotmart.com/pt-br/marketplace/produtos?q=gestao+clinica", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
-            ("Kit Mate Térmico Acero Inox UY", "Garrafa Térmica Inox de Precisão & Kit Chimarrão/Mate", "América do Sul", "Uruguai 🇺🇾", "Produtos Validados", "Modelo térmico de alta retenção de temperatura campeão de vendas no Uruguai e Sul do Brasil.", "Alta demanda regional e ticket médio elevado com ótima comissão.", "Consumidores de chimarrão, tereré e bebidas térmicas.", "Tendência Sul-Americana", "Faixa de R$ 149 • ★ 4.9 (Top UY)", "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=800&q=80", 0, 90, "https://www.google.com/search?q=termo+mate+acero+inoxidable+uruguay", "https://lista.mercadolivre.com.br/garrafa-termica-inox-mate", "https://www.amazon.com.br/s?k=garrafa+termica+inox+mate", "https://www.amazon.com.br/s?k=garrafa+termica+inox+mate", datetime.now().strftime("%d/%m/%Y %H:%M"))
+            ("Sistema Gestión Clínicas & Turnos AR", "Sistema Inteligente de Agendamento & Gestão de Clínicas", "América do Sul", "Argentina 🇦🇷", "Templates & Planilhas", "Organize agendas, histórico de pacientes e faturamento mensal sem planilhas bagunçadas.", "Forte adoção por clínicas pequenas e consultórios buscando reduzir faltas.", "Fisioterapeutas, dentistas, psicólogos e clínicas de estética.", "Google Trends AR", "A partir de R$ 67 • ★ 4.9 (LATAM)", "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80", 0, 92, "https://trends.google.com/trends/explore?geo=AR&q=gestion%20turnos%20clinicas", "https://lista.mercadolivre.com.br/planilha-gestao-clinica", "https://hotmart.com/pt-br/marketplace/produtos?q=gestao+clinica", "https://kiwify.com.br", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("Kit Mate Térmico Acero Inox UY", "Garrafa Térmica Inox de Precisão & Kit Chimarrão/Mate", "América do Sul", "Uruguai 🇺🇾", "Produtos Validados", "Mantenha a temperatura ideal por horas com bico de precisão anti-respingos em aço inox.", "Alta demanda regional e ticket médio elevado com ótima comissão.", "Consumidores de chimarrão, tereré e bebidas térmicas.", "Tendência Sul-Americana", "Faixa de R$ 149 • ★ 4.9 (Top UY)", "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=800&q=80", 0, 90, "https://www.google.com/search?q=termo+mate+acero+inoxidable+uruguay", "https://lista.mercadolivre.com.br/garrafa-termica-inox-mate", "https://www.amazon.com.br/s?k=garrafa+termica+inox+mate", "https://www.amazon.com.br/s?k=garrafa+termica+inox+mate", datetime.now().strftime("%d/%m/%Y %H:%M"))
         ]
         c.executemany('''
             INSERT OR IGNORE INTO opportunities (
@@ -371,6 +371,7 @@ PUBLIC_HTML = f"""
     <section id="destaques" class="max-w-5xl mx-auto px-4 mb-10">
         <div class="text-center mb-5">
             <span class="bg-amber-100 text-amber-900 text-[11px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full">🔥 Top 3 Achados da Semana</span>
+            <p class="text-xs text-slate-500 mt-1.5">Itens com maior demanda e melhor custo-benefício validados nesta semana</p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             {{% for item in featured_items %}}
@@ -390,7 +391,7 @@ PUBLIC_HTML = f"""
                 </div>
                 <div class="px-5 pb-5">
                     <a href="{{{{ item[17] }}}}" target="_blank" class="block w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-sm">
-                        {{{{ 'Acessar Treinamento / Ferramenta →' if item[5] == 'Cursos & IA' else ('Baixar Modelo Pronto →' if item[5] == 'Templates & Planilhas' else 'Conferir Menor Preço →') }}}}
+                        {{{{ 'Ver Conteúdo e Acesso →' if item[5] == 'Cursos & IA' else ('Ver Modelo e Recursos →' if item[5] == 'Templates & Planilhas' else 'Conferir Oferta e Detalhes →') }}}}
                     </a>
                 </div>
             </div>
@@ -422,7 +423,7 @@ PUBLIC_HTML = f"""
                 </div>
                 <div class="px-5 pb-5">
                     <a href="{{{{ item[17] }}}}" target="_blank" class="block w-full bg-[#0A2540] hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">
-                        {{{{ 'Acessar Treinamento / Ferramenta →' if item[5] == 'Cursos & IA' else ('Baixar Modelo Pronto →' if item[5] == 'Templates & Planilhas' else 'Conferir Menor Preço →') }}}}
+                        {{{{ 'Ver Conteúdo e Acesso →' if item[5] == 'Cursos & IA' else ('Ver Modelo e Recursos →' if item[5] == 'Templates & Planilhas' else 'Conferir Oferta e Detalhes →') }}}}
                     </a>
                 </div>
             </div>
@@ -431,13 +432,14 @@ PUBLIC_HTML = f"""
 
         <div class="mt-14 bg-[#0A2540] text-white rounded-3xl p-8 text-center shadow-lg max-w-3xl mx-auto">
             <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">Radar VIP Gratuito</span>
-            <h3 class="text-2xl font-black mt-3">Receba os 5 Achados da Semana Antes de Todo Mundo</h3>
+            <h3 class="text-2xl font-black mt-3">Receba os 5 Achados Mais Fortes da Semana</h3>
             <p class="text-xs md:text-sm text-slate-300 mt-2 max-w-xl mx-auto">
-                Entre no nosso canal de alertas para receber promoções relâmpago do Brasil e ferramentas virais dos EUA e Europa direto no seu celular.
+                Seleção semanal filtrada com as melhores ofertas do Brasil e ferramentas validadas dos EUA e Europa direto no seu celular.
             </p>
             <a href="{VIP_CHANNEL_URL}" target="_blank" class="inline-block mt-5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold px-6 py-3 rounded-xl text-sm transition shadow">
                 Entrar no Canal VIP Gratuito →
             </a>
+            <p class="text-[11px] text-slate-400 mt-2.5">Sem spam • Curadoria semanal gratuita</p>
         </div>
     </main>
 
@@ -605,4 +607,144 @@ ADMIN_HTML = """
                         <div class="grid grid-cols-3 gap-2 text-[11px] font-bold">
                             <a href="{{ item[14] }}" target="_blank" class="bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 py-2 px-2 rounded-lg text-center transition">1. Fonte Trends ↗</a>
                             <a href="{{ item[15] }}" target="_blank" class="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 py-2 px-2 rounded-lg text-center transition">2. Mercado BR ↗</a>
-                            <a href="{{ item[16] }}" target="_blank"
+                            <a href="{{ item[16] }}" target="_blank" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 py-2 px-2 rounded-lg text-center transition">3. Fornecedor ↗</a>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="POST" action="/admin/update-link/{{ item[0] }}" class="mt-4 pt-3 border-t border-slate-100 flex gap-2">
+                    <input type="url" name="affiliate_url" value="{{ item[17] }}" required class="flex-1 bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs">
+                    <button type="submit" class="bg-[#0A2540] hover:bg-emerald-600 text-white font-bold px-3.5 py-2 rounded-lg text-xs transition">Salvar Link</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
+"""
+
+# --- 4. ROTAS DA APLICAÇÃO ---
+@app.route("/")
+def index():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT * FROM opportunities WHERE is_featured = 1 ORDER BY gap_score DESC LIMIT 3")
+    featured_items = c.fetchall()
+    c.execute("SELECT * FROM opportunities ORDER BY is_featured DESC, gap_score DESC, id DESC")
+    items = c.fetchall()
+    conn.close()
+    return render_template_string(PUBLIC_HTML, featured_items=featured_items, items=items)
+
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+    ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+    if is_ip_blocked(ip):
+        return render_template_string(LOGIN_HTML, error="Muitas tentativas inválidas. Aguarde 30 minutos.")
+    if request.method == "POST":
+        pwd = request.form.get("password", "")
+        if pwd == ADMIN_PASSWORD:
+            session["admin_logged_in"] = True
+            return redirect(url_for("admin_panel"))
+        register_failed_login(ip)
+        return render_template_string(LOGIN_HTML, error="Senha incorreta.")
+    return render_template_string(LOGIN_HTML, error=None)
+
+@app.route("/admin/logout")
+def admin_logout():
+    session.pop("admin_logged_in", None)
+    return redirect(url_for("index"))
+
+@app.route("/admin")
+@login_required
+def admin_panel():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT * FROM opportunities WHERE continent = 'Brasil' ORDER BY id DESC")
+    br_items = c.fetchall()
+    c.execute("SELECT * FROM opportunities ORDER BY is_featured DESC, gap_score DESC, id DESC")
+    items = c.fetchall()
+    conn.close()
+    return render_template_string(ADMIN_HTML, items=items, br_items=br_items)
+
+@app.route("/admin/add-item", methods=["POST"])
+@login_required
+def admin_add_item():
+    term_br = request.form.get("term_br", "").strip()
+    term_origin = request.form.get("term_origin", "").strip()
+    region_combo = request.form.get("region_combo", "Brasil|Brasil 🇧🇷")
+    continent, region_label = region_combo.split("|", 1)
+    format_type = request.form.get("format_type", "Produtos Validados")
+    price_badge = request.form.get("price_badge", "").strip()
+    image_url = request.form.get("image_url", "").strip() or DEFAULT_IMAGES.get(format_type)
+    why_trending = request.form.get("why_trending", "").strip()
+    target_audience = request.form.get("target_audience", "").strip()
+    supplier_url = request.form.get("supplier_url", "").strip()
+    affiliate_url = request.form.get("affiliate_url", "").strip()
+    description = request.form.get("description", "").strip()
+    trend_url = f"https://trends.google.com/trends/explore?q={requests.utils.quote(term_origin)}"
+    br_url = f"https://lista.mercadolivre.com.br/{requests.utils.quote(term_br)}"
+
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute('''
+        INSERT OR REPLACE INTO opportunities (
+            term_origin, term_br, continent, region, format_type, description,
+            why_trending, target_audience, source_name, price_badge, image_url, is_featured,
+            gap_score, trend_source_url, br_market_url, supplier_url, affiliate_url, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (term_origin, term_br, continent, region_label, format_type, description, why_trending, target_audience, "Curadoria Manual Admin", price_badge, image_url, 0, 95, trend_url, br_url, supplier_url, affiliate_url, datetime.now().strftime("%d/%m/%Y %H:%M")))
+    conn.commit()
+    conn.close()
+    return redirect(url_for("admin_panel"))
+
+@app.route("/admin/update-link/<int:item_id>", methods=["POST"])
+@login_required
+def admin_update_link(item_id):
+    new_url = request.form.get("affiliate_url", "").strip()
+    if new_url:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("UPDATE opportunities SET affiliate_url = ? WHERE id = ?", (new_url, item_id))
+        conn.commit()
+        conn.close()
+    return redirect(url_for("admin_panel"))
+
+@app.route("/admin/toggle-featured/<int:item_id>")
+@login_required
+def admin_toggle_featured(item_id):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("UPDATE opportunities SET is_featured = CASE WHEN is_featured = 1 THEN 0 ELSE 1 END WHERE id = ?", (item_id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for("admin_panel"))
+
+@app.route("/admin/delete/<int:item_id>")
+@login_required
+def admin_delete(item_id):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("DELETE FROM opportunities WHERE id = ?", (item_id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for("admin_panel"))
+
+@app.route("/admin/run-now")
+@login_required
+def admin_run_now():
+    threading.Thread(target=run_radar_cycle, args=("geral",), daemon=True).start()
+    return redirect(url_for("admin_panel"))
+
+@app.route("/cron/radar")
+def cron_radar():
+    key = request.args.get("key", "")
+    nicho = request.args.get("nicho", "geral")
+    if key != CRON_SECRET_KEY:
+        return jsonify({"status": "unauthorized"}), 403
+    threading.Thread(target=run_radar_cycle, args=(nicho,), daemon=True).start()
+    return jsonify({"status": "started", "nicho": nicho})
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
